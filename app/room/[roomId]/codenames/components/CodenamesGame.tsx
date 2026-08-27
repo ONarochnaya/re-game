@@ -2,7 +2,7 @@
 
 import {useEffect, useState} from "react";
 import {useRouter} from "next/navigation";
-import {createGame} from "@/lib/gameEngine";
+import {addClue, createGame} from "@/lib/gameEngine";
 import {useSync} from "@/lib/useSync";
 import {WORD_POOL} from "@/lib/words";
 import type {Card, Role, Team} from "@/lib/types";
@@ -29,6 +29,9 @@ export default function CodenamesGame({roomId}: { roomId: string }) {
     const [game, setGame] = useSync(roomId, createGame(WORD_POOL));
     const [team, setTeam] = useState<Team | null>(null);
     const [role, setRole] = useState<Role | null>(null);
+    const [clueWord, setClueWord] = useState("");
+    const [clueNumber, setClueNumber] = useState("");
+    const [clueError, setClueError] = useState<string | null>(null);
     const [playerName] = useState<string | null>(() => {
         if (typeof window === "undefined") return null;
         return sessionStorage.getItem("reGamePlayerName");
@@ -116,6 +119,28 @@ export default function CodenamesGame({roomId}: { roomId: string }) {
 
     const redPlayers = game.players.filter((p) => p.team === "red");
     const bluePlayers = game.players.filter((p) => p.team === "blue");
+    const clueHistory = [...game.clueHistory].reverse();
+
+    function handleGiveClue() {
+        const trimmedWord = clueWord.trim();
+        const parsedNumber = Number(clueNumber);
+        const isValidNumber =
+            clueNumber.trim() !== "" &&
+            Number.isInteger(parsedNumber) &&
+            parsedNumber >= 0;
+
+        if (!trimmedWord || !isValidNumber) {
+            setClueError("Enter a word and a non-negative whole number.");
+            return;
+        }
+
+        setClueError(null);
+        setGame((prev) =>
+            addClue(prev, {team, playerName, word: trimmedWord, number: parsedNumber})
+        );
+        setClueWord("");
+        setClueNumber("");
+    }
 
     return (
         <main className="flex flex-1 flex-col items-center justify-center gap-4 p-8">
@@ -147,6 +172,53 @@ export default function CodenamesGame({roomId}: { roomId: string }) {
                         ))}
                     </ul>
                 </div>
+            </div>
+
+            {role === "spymaster" && (
+                <div className="flex flex-col items-center gap-2">
+                    <p className="text-sm font-medium">Give a clue</p>
+                    <div className="flex gap-2">
+                        <input
+                            type="text"
+                            value={clueWord}
+                            onChange={(e) => setClueWord(e.target.value)}
+                            placeholder="Word"
+                            className="rounded border border-zinc-300 px-3 py-1"
+                        />
+                        <input
+                            type="number"
+                            value={clueNumber}
+                            onChange={(e) => setClueNumber(e.target.value)}
+                            placeholder="Number"
+                            className="w-20 rounded border border-zinc-300 px-3 py-1"
+                        />
+                        <button
+                            onClick={handleGiveClue}
+                            className="rounded bg-black px-4 py-1 text-white dark:bg-white dark:text-black"
+                        >
+                            Give Clue
+                        </button>
+                    </div>
+                    {clueError && <p className="text-sm text-red-500">{clueError}</p>}
+                </div>
+            )}
+
+            <div className="flex flex-col items-center gap-2">
+                <p className="text-sm font-medium">Clue History</p>
+                <ul className="text-sm">
+                    {clueHistory.map((clue) => (
+                        <li key={clue.id}>
+                            <span
+                                className={clue.team === "red" ? "text-red-600" : "text-blue-600"}
+                            >
+                                {clue.team === "red" ? "Red" : "Blue"}
+                            </span>
+                            {" — "}
+                            {clue.playerName === playerName ? `You: ${clue.playerName}` : clue.playerName}
+                            : {clue.word.toUpperCase()} ({clue.number})
+                        </li>
+                    ))}
+                </ul>
             </div>
 
             <div className="grid grid-cols-5 gap-2">
