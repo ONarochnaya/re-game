@@ -68,10 +68,8 @@ export default function NameEntryPage() {
       <div className="pointer-events-none absolute -bottom-32 -right-40 h-[600px] w-[600px] rounded-full bg-teal-300/50 blur-[110px]" />
 
       <div className="relative z-10 w-full max-w-lg rounded-2xl border border-[#D1DCE5] bg-white p-8 shadow-xl shadow-slate-200/60 sm:p-10">
-        <div className="mb-6 flex justify-center">
-          <span className="inline-flex items-center gap-2 rounded-full border border-[#5FE8EC] bg-[#F1FDFD] px-4 py-1.5 text-sm font-bold text-[#1F2B38]">
-            🎮 re-game
-          </span>
+        <div id="logo" className="mb-6 flex justify-center">
+          <img src="/logo-regame.svg" alt="re-game" className="h-8 w-auto" />
         </div>
 
         <h1 className="text-center font-display text-[32px] font-bold leading-tight text-[#1F2B38] sm:text-[40px]">
