@@ -2,12 +2,25 @@
 
 import {useEffect, useState} from "react";
 import {useRouter} from "next/navigation";
-import {addClue, createGame} from "@/lib/gameEngine";
+import {addClue, checkWinCondition, createGame, revealMultiple} from "@/lib/gameEngine";
 import {useSync} from "@/lib/useSync";
 import {WORD_POOL} from "@/lib/words";
 import type {Card, Role, Team} from "@/lib/types";
 
 function getCardDisplay(card: Card, myRole: Role): string {
+    if (card.revealed) {
+        switch (card.team) {
+            case "red":
+                return "bg-red-200 text-red-400 border-2 border-gray-400";
+            case "blue":
+                return "bg-blue-200 text-blue-400 border-2 border-gray-400";
+            case "neutral":
+                return "bg-yellow-50 text-gray-400 border-2 border-gray-400";
+            case "assassin":
+                return "bg-gray-700 text-gray-400 border-2 border-gray-400";
+        }
+    }
+
     if (myRole === "spymaster") {
         switch (card.team) {
             case "red":
@@ -32,6 +45,7 @@ export default function CodenamesGame({roomId}: { roomId: string }) {
     const [clueWord, setClueWord] = useState("");
     const [clueNumber, setClueNumber] = useState("");
     const [clueError, setClueError] = useState<string | null>(null);
+    const [selectedIndices, setSelectedIndices] = useState<Set<number>>(new Set());
     const [playerName] = useState<string | null>(() => {
         if (typeof window === "undefined") return null;
         return sessionStorage.getItem("reGamePlayerName");
@@ -121,6 +135,11 @@ export default function CodenamesGame({roomId}: { roomId: string }) {
     const bluePlayers = game.players.filter((p) => p.team === "blue");
     const clueHistory = [...game.clueHistory].reverse();
 
+    const redCards = game.cards.filter((c) => c.team === "red");
+    const blueCards = game.cards.filter((c) => c.team === "blue");
+    const redRevealedCount = redCards.filter((c) => c.revealed).length;
+    const blueRevealedCount = blueCards.filter((c) => c.revealed).length;
+
     function handleGiveClue() {
         if (!team || !playerName) return;
 
@@ -142,6 +161,31 @@ export default function CodenamesGame({roomId}: { roomId: string }) {
         );
         setClueWord("");
         setClueNumber("");
+    }
+
+    function toggleCardSelection(index: number) {
+        if (role !== "operative" || game.cards[index].revealed) return;
+
+        setSelectedIndices((prev) => {
+            const next = new Set(prev);
+            if (next.has(index)) {
+                next.delete(index);
+            } else {
+                next.add(index);
+            }
+            return next;
+        });
+    }
+
+    function handleReveal() {
+        if (selectedIndices.size === 0) return;
+
+        setGame((prev) => {
+            const revealed = revealMultiple(prev, Array.from(selectedIndices));
+            const winner = checkWinCondition(revealed);
+            return {...revealed, winner};
+        });
+        setSelectedIndices(new Set());
     }
 
     return (
@@ -176,6 +220,21 @@ export default function CodenamesGame({roomId}: { roomId: string }) {
                 </div>
             </div>
 
+            <div className="flex gap-6 text-sm">
+                <p className="font-medium text-red-600">
+                    Red: {redRevealedCount} / {redCards.length} revealed
+                </p>
+                <p className="font-medium text-blue-600">
+                    Blue: {blueRevealedCount} / {blueCards.length} revealed
+                </p>
+            </div>
+
+            {game.winner && (
+                <p className="text-lg font-semibold">
+                    🎉 {game.winner === "red" ? "Red" : "Blue"} team wins!
+                </p>
+            )}
+
             {role === "spymaster" && (
                 <div className="flex flex-col items-center gap-2">
                     <p className="text-sm font-medium">Give a clue</p>
@@ -188,7 +247,7 @@ export default function CodenamesGame({roomId}: { roomId: string }) {
                             className="rounded border border-zinc-300 px-3 py-1"
                         />
                         <input
-                            type="number"
+                            type="text"
                             value={clueNumber}
                             onChange={(e) => setClueNumber(e.target.value)}
                             placeholder="Number"
@@ -224,18 +283,36 @@ export default function CodenamesGame({roomId}: { roomId: string }) {
             </div>
 
             <div className="grid grid-cols-5 gap-2">
-                {game.cards.map((card) => (
-                    <div
-                        key={card.word}
-                        className={`flex aspect-square w-24 items-center justify-center rounded p-2 text-center text-sm font-medium ${getCardDisplay(
-                            card,
-                            role
-                        )}`}
-                    >
-                        {card.word}
-                    </div>
-                ))}
+                {game.cards.map((card, index) => {
+                    const isSelected = !card.revealed && selectedIndices.has(index);
+                    const isClickable = role === "operative" && !card.revealed;
+
+                    return (
+                        <div
+                            key={card.word}
+                            onClick={isClickable ? () => toggleCardSelection(index) : undefined}
+                            className={`flex aspect-square w-24 items-center justify-center rounded p-2 text-center text-sm font-medium ${getCardDisplay(
+                                card,
+                                role
+                            )} ${isClickable ? "cursor-pointer" : ""} ${
+                                isSelected ? "ring-2 ring-black" : ""
+                            }`}
+                        >
+                            {card.word}
+                        </div>
+                    );
+                })}
             </div>
+
+            {role === "operative" && (
+                <button
+                    onClick={handleReveal}
+                    disabled={selectedIndices.size === 0}
+                    className="rounded bg-black px-4 py-2 text-white disabled:opacity-40 dark:bg-white dark:text-black"
+                >
+                    Reveal
+                </button>
+            )}
         </main>
     );
 }

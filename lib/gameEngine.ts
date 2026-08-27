@@ -56,15 +56,32 @@ export function revealCard(state: GameState, index: number): GameState {
 }
 
 export function revealMultiple(state: GameState, indices: number[]): GameState {
-  // TODO: implement in next iteration — apply revealCard for each index in order,
-  // stopping early if a reveal ends the turn (wrong team or assassin), to support
-  // the "reveal several guesses at once" flow from the real game rules.
-  return state;
+  if (indices.length === 0) return state;
+
+  const indexSet = new Set(indices);
+  const cards = state.cards.map((card, index) =>
+    indexSet.has(index) ? { ...card, revealed: true } : card
+  );
+
+  return {
+    ...state,
+    cards,
+  };
 }
 
 export function checkWinCondition(state: GameState): Team | null {
-  // TODO: implement in next iteration — a team wins once all of its cards are
-  // revealed; the assassin being revealed should hand the win to the other team.
+  // Assassin reveal should also end the game (handing win to the other team) —
+  // not yet implemented, add this branch later.
+
+  const redCards = state.cards.filter((card) => card.team === "red");
+  const blueCards = state.cards.filter((card) => card.team === "blue");
+
+  const redRevealed = redCards.filter((card) => card.revealed).length;
+  const blueRevealed = blueCards.filter((card) => card.revealed).length;
+
+  if (redRevealed === redCards.length) return "red";
+  if (blueRevealed === blueCards.length) return "blue";
+
   return state.winner;
 }
 

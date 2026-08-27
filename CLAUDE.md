@@ -1,51 +1,81 @@
 # re:game — project context for Claude Code
 
 ## What this is
-2-day hackathon project. A "zero-setup" game platform for remote teams.
+2-day hackathon project: a "zero-setup" game platform for remote teams.
 Only Codenames is functionally real — everything else is UI/mock surface
-to sell the platform vision. Do not over-build beyond what's specified below.
+selling the platform vision. Don't over-build beyond what's specified here.
 
 ## Stack
-- Next.js (App Router), TypeScript strict
-- Tailwind only for styling — no CSS modules, no styled-components
-- Plain React state/hooks — no Redux/Zustand/Jotai, don't suggest adding one
-- No backend, no database, no auth — this is intentional, not a gap to fill
-- Sync between players = BroadcastChannel API only (same-machine, multi-tab).
-  Do NOT suggest websockets, Supabase, Pusher, or any network sync — out of scope.
-
-## Screens / routes
-- `/` — name entry (Screen 0)
-- `/lobby` — welcome + mini scoreboard + game picker (Screen 1)
-- `/scoreboard` — big scoreboard (Screen 2)
-- `/room/[roomId]/codenames` — the game (Screen 3)
-    - Role choice (spymaster/operative) is IN-COMPONENT STATE, not a route
-    - Room is created client-side on game selection, no pre-registration
-
-## Data reality — IMPORTANT, do not "fix" this
-- Scoreboard (Screens 1 & 2) is MOCKED static data. Do not wire it to anything real.
-  Both screens must read from the same mock data source/file.
-- Game list on Screen 1 is MOCKED except Codenames, which navigates for real.
-  Other tiles are visually present but disabled ("coming soon").
-- Codenames (Screen 3) is the only screen with real game logic.
-
-## Role visibility (known, accepted shortcut)
-GameState always contains true card colors. Rendering is role-aware:
-spymaster sees colors, operative doesn't. This is a client-side-only
-shortcut for the demo — do not build server-side-style data filtering,
-do not add "security" for this, it's explicitly out of scope for now.
-
-## Code conventions
-- Functional components only
-- Game rules logic (board gen, reveal, win check) lives in pure functions,
-  separate from components and separate from sync code — no side effects,
-  no BroadcastChannel calls inside game-logic files
+- Next.js (App Router), TypeScript strict, Tailwind only (no CSS modules/styled-components)
+- Plain React state/hooks — no Redux/Zustand/Jotai
+- No backend, no database, no auth — intentional, not a gap to fill
+- Sync = BroadcastChannel API only (same-machine, multi-tab). No websockets/Supabase/Pusher.
 - Don't add new dependencies without asking first
-- Keep components small — one screen's logic shouldn't leak into another's file
 
-## Ownership (avoid stepping on each other)
-- Olga: Screen 3 logic, sync layer (BroadcastChannel), roomId
-  generation/navigation glue
-- Tahnee, Sean: Screens 0, 1, 2 (fully), Screen 3 visual/styling layer
+## Routes
+- `/` — name entry (Screen 0)
+- `/lobby` — welcome + scoreboard preview + game picker (Screen 1)
+- `/scoreboard` — full scoreboard (Screen 2)
+- `/room/[roomId]/codenames` — the game (Screen 3). Role/team choice is
+  in-component state, not a route. Room created client-side on game
+  selection, no pre-registration.
+
+## Data reality — don't "fix" this
+- Scoreboard (Screens 1 & 2) is mocked static data, both screens share one source.
+- Game list on Screen 1 is mocked except Codenames, which is real/clickable;
+  other tiles show "coming soon."
+- Codenames is the only screen with real logic.
+
+## Identity & persistence
+- Player name: entered on Screen 0, stored in `sessionStorage` key
+  `reGamePlayerName` — intentionally per-tab (each tab = one demo player).
+- Current room: stored in `localStorage` key `reGameCurrentRoom` when a
+  game is created — intentionally shared across tabs, so Screen 1 shows
+  "Join current game" for tabs opened after the first. Starting a new
+  game always overwrites it; no explicit end/reset flow.
+- No persistence across refresh beyond these two keys. No reconnect handling.
+
+## Data model (lib/types.ts)
+- `Player = { id, name, team?, role? }`
+- `Card = { word, team: Team|'neutral'|'assassin', revealed }`
+- `Clue = { id, team, playerName, word, number, timestamp }`
+- `GameState = { cards, turn, winner, players: Player[], clueHistory: Clue[] }`
+
+## Game logic (lib/gameEngine.ts) — pure, no React/side effects/sync calls
+- `createGame(wordPool)` — implemented. Builds board + team distribution,
+  initializes `players: []`, `clueHistory: []`.
+- `addClue(state, clue)` — implemented. Append-only, never overwrites history.
+- `revealMultiple(state, indices)` — implemented. Sets `revealed: true` on
+  given indices, returns new state.
+- `revealCard`, `checkWinCondition`, `passTurn` — **still stubs**, return
+  state unchanged. No turn enforcement or win detection exists yet.
+- Card colors are always present in `GameState` (client-visible shortcut,
+  not filtered server-side) — role-based hiding happens only in rendering.
+
+## Sync layer (lib/useSync.ts)
+- Real BroadcastChannel, scoped to `re-game:${roomId}`. Signature unchanged:
+  `useSync(roomId, initialState) -> [state, setState]`.
+- Handles late joiners: on mount, broadcasts `requestState`; existing tabs
+  respond with current `GameState` so new tabs don't start fresh.
+
+## Screen 3 (CodenamesGame.tsx) — current behavior
+- Redirects to `/` if no name in `sessionStorage`.
+- Team/role picker writes the player into `game.players` via `setGame`
+  (synced). Changing team/role after picking is not supported.
+- Teams section lists players by team; own entry shown as "You: {name}".
+- Clue form shown only to spymasters (their own team); submits via
+  `addClue`. Clue history visible to everyone, newest first, own clues
+  prefixed "You:".
+- `getCardDisplay(card, role)`: spymasters see true colors on unrevealed
+  cards; any card with `revealed: true` shows true color regardless of role.
+- Operatives can click unrevealed cards to toggle local selection
+  (`selectedIndices`, not synced), then "Reveal" commits via
+  `revealMultiple` (synced). Spymasters cannot click cards.
+- No turn enforcement anywhere yet — any player can act at any time.
+- Rendered via a client-only wrapper (`CodenamesGameClient.tsx`) using
+  `dynamic(..., { ssr: false })`, because `page.tsx` is a Server Component
+  (it awaits `params`) and `ssr:false` isn't honored called directly from
+  a Server Component in the App Router. Don't collapse this back to one file.
 
 ## Explicitly out of scope for this hackathon
 - Any real backend, database, or auth
@@ -114,30 +144,3 @@ its own randomly-generated board and empty players list.
 - Note: createGame(WORD_POOL) is currently called inline as the initialState
   arg to useSync on every render — harmless (useState ignores it after first
   render) but worth memoizing later if it becomes a real cost.
-
-  ## The fonts and colours
-- Typography
-- Two font families: Fredoka for headings, Outfit for body text.
-
-- Style	Font	Size	Weight
-- H2	Fredoka	48px	Bold (700)
-- H3	Fredoka	40px	Bold (700)
-- H3 (small)	Fredoka	32px	Bold (700)
-- Large Bold	Fredoka	24px	Bold (700)
-- Large	Fredoka	24px	Regular (400)
-- Body Bold	Outfit	16px	Bold (700)
-- Body	Outfit	16px	Regular (400)
-
-- Colours
-- Each colour has four shades, darkest to lightest:
-
-- Dark / Grey: #1F2B38 · #65707B · #D1DCE5 · #F5F7F9
-
-- Cyan: #5FE8EC · #90EFF2 · #C0F6F7 · #F1FDFD
-
-- Purple: #8B5CF6 · #AE8EF9 · #D1BFFB · #F5F1FE
-
-- Pink: #EC4899 · #F280B8 · #F8B9D8 · #FEF1F7
-
-- Green: #10B981 · #5BD0A9 · #A6E7D1 · #F1FEFA
-
