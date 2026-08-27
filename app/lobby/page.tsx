@@ -15,7 +15,7 @@ const placeholderCards = [
     route: "codenames",
   },
   {
-    title: "Placeholder 2",
+    title: "Two truths one lie",
     tone: "bg-zinc-300",
     image: twoTruthsImage.src,
     route: "twotruths1lie",
