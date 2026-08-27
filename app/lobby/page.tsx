@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import scoreboardCard from "./scoreboard-card.png";
+import simpleLeaderboard from "./simple-leaderboard.png";
 
 const placeholderCards = [
   { title: "Placeholder 1", tone: "bg-zinc-200" },
@@ -28,7 +28,7 @@ export default function LobbyPage() {
             Welcome
           </p>
           <h1 className="mt-4 text-4xl font-bold tracking-tight sm:text-5xl">
-            Welcome to re-game
+            re-game
           </h1>
         </header>
 
@@ -46,11 +46,13 @@ export default function LobbyPage() {
         </section>
 
         <div className="flex w-full justify-center">
-          <img
-            src={scoreboardCard.src}
-            alt="Scoreboard card"
-            className="w-full max-w-2xl rounded-2xl"
-          />
+          <Link href="/scoreboard" className="block w-full max-w-2xl">
+            <img
+              src={simpleLeaderboard.src}
+              alt="Simple leaderboard preview"
+              className="w-full rounded-2xl"
+            />
+          </Link>
         </div>
 
         <div className="flex flex-col items-center gap-4">
