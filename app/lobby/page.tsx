@@ -42,10 +42,10 @@ export default function LobbyPage() {
   }
 
   return (
-    <main className="min-h-screen bg-zinc-50 px-6 py-16 text-zinc-900">
+    <main className="min-h-screen bg-[#F5F7F9] px-6 py-16 font-sans text-[#1F2B38]">
       <div className="mx-auto flex max-w-6xl flex-col items-center gap-10">
         <header className="text-center">
-          <h1 className="mt-4 text-4xl font-bold tracking-tight sm:text-5xl">
+          <h1 className="mt-4 font-display text-4xl font-bold text-[#1F2B38] sm:text-5xl">
             Pick a game to play
           </h1>
         </header>
@@ -70,7 +70,7 @@ export default function LobbyPage() {
               tabIndex={image ? 0 : undefined}
             >
               <div
-                className={`flex aspect-square w-full items-center justify-center overflow-hidden rounded-2xl border border-zinc-300 ${tone} shadow-sm`}
+                className={`flex aspect-square w-full items-center justify-center overflow-hidden rounded-2xl border border-[#D1DCE5] ${tone} shadow-sm`}
               >
                 {image ? (
                   <img
@@ -79,10 +79,10 @@ export default function LobbyPage() {
                     className="h-full w-full object-cover"
                   />
                 ) : (
-                  <span className="text-sm font-medium text-zinc-600">Image</span>
+                  <span className="text-sm font-medium text-[#65707B]">Image</span>
                 )}
               </div>
-              <p className="text-sm font-medium text-zinc-700">{title}</p>
+              <p className="text-sm font-bold text-[#1F2B38]">{title}</p>
             </div>
           ))}
         </section>
@@ -100,19 +100,19 @@ export default function LobbyPage() {
         <div className="flex flex-col items-center gap-4">
           <button
             onClick={handlePlayCodenames}
-            className="rounded bg-black px-4 py-2 text-white dark:bg-white dark:text-black"
+            className="rounded-lg bg-[#8B5CF6] px-5 py-3 font-bold text-white transition hover:bg-[#AE8EF9]"
           >
             Play Codenames
           </button>
           {currentRoomId && (
             <button
               onClick={handleJoinCurrentGame}
-              className="rounded border border-zinc-300 px-4 py-2 text-zinc-900"
+              className="rounded-lg border-2 border-[#5FE8EC] px-5 py-3 font-bold text-[#1F2B38] transition hover:bg-[#C0F6F7]"
             >
               Join current game
             </button>
           )}
-          <Link href="/scoreboard" className="underline">
+          <Link href="/scoreboard" className="font-bold text-[#EC4899] underline decoration-[#F280B8] underline-offset-4">
             View Scoreboard
           </Link>
         </div>
