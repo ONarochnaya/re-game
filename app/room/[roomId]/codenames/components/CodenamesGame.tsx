@@ -11,30 +11,30 @@ function getCardDisplay(card: Card, myRole: Role): string {
     if (card.revealed) {
         switch (card.team) {
             case "red":
-                return "bg-red-200 text-red-400 border-2 border-gray-400";
+                return "bg-[#48B500]/20 text-[#48B500] border-2 border-[#D1DCE5]";
             case "blue":
-                return "bg-blue-200 text-blue-400 border-2 border-gray-400";
+                return "bg-[#0069A1]/20 text-[#0069A1] border-2 border-[#D1DCE5]";
             case "neutral":
-                return "bg-yellow-50 text-gray-400 border-2 border-gray-400";
+                return "bg-[#F5F7F9] text-[#65707B] border-2 border-[#D1DCE5]";
             case "assassin":
-                return "bg-gray-700 text-gray-400 border-2 border-gray-400";
+                return "bg-[#65707B] text-white border-2 border-[#D1DCE5]";
         }
     }
 
     if (myRole === "spymaster") {
         switch (card.team) {
             case "red":
-                return "bg-red-400 text-white";
+                return "bg-[#48B500] text-white";
             case "blue":
-                return "bg-blue-400 text-white";
+                return "bg-[#0069A1] text-white";
             case "neutral":
-                return "bg-yellow-100 text-black";
+                return "bg-[#D1DCE5] text-[#1F2B38]";
             case "assassin":
-                return "bg-black text-white";
+                return "bg-[#1F2B38] text-white";
         }
     }
 
-    return "bg-gray-200 text-gray-800";
+    return "bg-[#D1DCE5] text-[#1F2B38]";
 }
 
 export default function CodenamesGame({roomId}: { roomId: string }) {
@@ -81,24 +81,24 @@ export default function CodenamesGame({roomId}: { roomId: string }) {
     if (!team || !role) {
         return (
             <main className="flex flex-1 flex-col items-center justify-center gap-6 p-8">
-                <h1 className="text-2xl font-semibold">Screen 3: Codenames</h1>
-                <p className="text-sm text-zinc-500">Room: {roomId}</p>
+                <h1 className="font-display text-[32px] font-bold text-[#1F2B38]">Screen 3: Codenames</h1>
+                <p className="text-sm text-[#65707B]">Room: {roomId}</p>
 
                 <div className="flex flex-col items-center gap-2">
-                    <p className="text-sm font-medium">Pick a team</p>
+                    <p className="font-display text-2xl font-bold text-[#1F2B38]">Pick a team</p>
                     <div className="flex gap-2">
                         <button
                             onClick={() => setTeam("red")}
-                            className={`rounded px-4 py-2 text-white ${
-                                team === "red" ? "bg-red-600" : "bg-red-400"
+                            className={`rounded bg-[#48B500] px-4 py-2 font-bold text-white ${
+                                team === "red" ? "ring-2 ring-offset-2 ring-[#1F2B38]" : ""
                             }`}
                         >
-                            Red
+                            Green
                         </button>
                         <button
                             onClick={() => setTeam("blue")}
-                            className={`rounded px-4 py-2 text-white ${
-                                team === "blue" ? "bg-blue-600" : "bg-blue-400"
+                            className={`rounded bg-[#0069A1] px-4 py-2 font-bold text-white ${
+                                team === "blue" ? "ring-2 ring-offset-2 ring-[#1F2B38]" : ""
                             }`}
                         >
                             Blue
@@ -107,20 +107,24 @@ export default function CodenamesGame({roomId}: { roomId: string }) {
                 </div>
 
                 <div className="flex flex-col items-center gap-2">
-                    <p className="text-sm font-medium">Pick a role</p>
+                    <p className="font-display text-2xl font-bold text-[#1F2B38]">Pick a role</p>
                     <div className="flex gap-2">
                         <button
                             onClick={() => setRole("spymaster")}
-                            className={`rounded border px-4 py-2 ${
-                                role === "spymaster" ? "border-black font-semibold" : "border-zinc-300"
+                            className={`rounded border px-4 py-2 font-bold ${
+                                role === "spymaster"
+                                    ? "border-[#8B5CF6] bg-[#8B5CF6] text-white"
+                                    : "border-[#D1DCE5] text-[#1F2B38]"
                             }`}
                         >
                             Spymaster
                         </button>
                         <button
                             onClick={() => setRole("operative")}
-                            className={`rounded border px-4 py-2 ${
-                                role === "operative" ? "border-black font-semibold" : "border-zinc-300"
+                            className={`rounded border px-4 py-2 font-bold ${
+                                role === "operative"
+                                    ? "border-[#8B5CF6] bg-[#8B5CF6] text-white"
+                                    : "border-[#D1DCE5] text-[#1F2B38]"
                             }`}
                         >
                             Operative
@@ -190,14 +194,14 @@ export default function CodenamesGame({roomId}: { roomId: string }) {
 
     return (
         <main className="flex flex-1 flex-col items-center justify-center gap-4 p-8">
-            <h1 className="text-2xl font-semibold">Screen 3: Codenames</h1>
-            <p className="text-sm text-zinc-500">
+            <h1 className="font-display text-[32px] font-bold text-[#1F2B38]">Screen 3: Codenames</h1>
+            <p className="text-sm text-[#65707B]">
                 Room: {roomId} — {team} {role}
             </p>
 
             <div className="grid w-full max-w-md grid-cols-2 gap-4">
                 <div>
-                    <p className="text-sm font-semibold text-red-600">Red</p>
+                    <p className="font-display text-2xl font-bold text-[#48B500]">Green</p>
                     <ul className="text-sm">
                         {redPlayers.map((p) => (
                             <li key={p.id}>
@@ -208,7 +212,7 @@ export default function CodenamesGame({roomId}: { roomId: string }) {
                     </ul>
                 </div>
                 <div>
-                    <p className="text-sm font-semibold text-blue-600">Blue</p>
+                    <p className="font-display text-2xl font-bold text-[#0069A1]">Blue</p>
                     <ul className="text-sm">
                         {bluePlayers.map((p) => (
                             <li key={p.id}>
@@ -221,58 +225,58 @@ export default function CodenamesGame({roomId}: { roomId: string }) {
             </div>
 
             <div className="flex gap-6 text-sm">
-                <p className="font-medium text-red-600">
-                    Red: {redRevealedCount} / {redCards.length} revealed
+                <p className="font-bold text-[#48B500]">
+                    Green: {redRevealedCount} / {redCards.length} revealed
                 </p>
-                <p className="font-medium text-blue-600">
+                <p className="font-bold text-[#0069A1]">
                     Blue: {blueRevealedCount} / {blueCards.length} revealed
                 </p>
             </div>
 
             {game.winner && (
-                <p className="text-lg font-semibold">
-                    🎉 {game.winner === "red" ? "Red" : "Blue"} team wins!
+                <p className="font-display text-2xl font-bold text-[#10B981]">
+                    🎉 {game.winner === "red" ? "Green" : "Blue"} team wins!
                 </p>
             )}
 
             {role === "spymaster" && (
                 <div className="flex flex-col items-center gap-2">
-                    <p className="text-sm font-medium">Give a clue</p>
+                    <p className="font-display text-2xl font-bold text-[#1F2B38]">Give a clue</p>
                     <div className="flex gap-2">
                         <input
                             type="text"
                             value={clueWord}
                             onChange={(e) => setClueWord(e.target.value)}
                             placeholder="Word"
-                            className="rounded border border-zinc-300 px-3 py-1"
+                            className="rounded border border-[#D1DCE5] px-3 py-1"
                         />
                         <input
                             type="text"
                             value={clueNumber}
                             onChange={(e) => setClueNumber(e.target.value)}
                             placeholder="Number"
-                            className="w-20 rounded border border-zinc-300 px-3 py-1"
+                            className="w-20 rounded border border-[#D1DCE5] px-3 py-1"
                         />
                         <button
                             onClick={handleGiveClue}
-                            className="rounded bg-black px-4 py-1 text-white dark:bg-white dark:text-black"
+                            className="rounded bg-[#8B5CF6] px-4 py-1 font-bold text-white"
                         >
                             Give Clue
                         </button>
                     </div>
-                    {clueError && <p className="text-sm text-red-500">{clueError}</p>}
+                    {clueError && <p className="text-sm text-[#EC4899]">{clueError}</p>}
                 </div>
             )}
 
             <div className="flex flex-col items-center gap-2">
-                <p className="text-sm font-medium">Clue History</p>
+                <p className="font-display text-2xl font-bold text-[#1F2B38]">Clue History</p>
                 <ul className="text-sm">
                     {clueHistory.map((clue) => (
                         <li key={clue.id}>
                             <span
-                                className={clue.team === "red" ? "text-red-600" : "text-blue-600"}
+                                className={clue.team === "red" ? "text-[#48B500]" : "text-[#0069A1]"}
                             >
-                                {clue.team === "red" ? "Red" : "Blue"}
+                                {clue.team === "red" ? "Green" : "Blue"}
                             </span>
                             {" — "}
                             {clue.playerName === playerName ? `You: ${clue.playerName}` : clue.playerName}
@@ -295,7 +299,7 @@ export default function CodenamesGame({roomId}: { roomId: string }) {
                                 card,
                                 role
                             )} ${isClickable ? "cursor-pointer" : ""} ${
-                                isSelected ? "ring-2 ring-black" : ""
+                                isSelected ? "ring-2 ring-[#8B5CF6]" : ""
                             }`}
                         >
                             {card.word}
@@ -308,7 +312,7 @@ export default function CodenamesGame({roomId}: { roomId: string }) {
                 <button
                     onClick={handleReveal}
                     disabled={selectedIndices.size === 0}
-                    className="rounded bg-black px-4 py-2 text-white disabled:opacity-40 dark:bg-white dark:text-black"
+                    className="rounded bg-[#10B981] px-4 py-2 font-bold text-white disabled:opacity-40"
                 >
                     Reveal
                 </button>
