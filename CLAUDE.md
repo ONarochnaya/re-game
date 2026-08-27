@@ -70,17 +70,36 @@ do not add "security" for this, it's explicitly out of scope for now.
   (`getCardDisplay` or similar) in the Codenames page component —
   don't inline color/reveal logic in JSX, extend the helper instead.
 
-## Sync layer (stubbed, not implemented)
-- `lib/useSync.ts` exists as a stub — currently just wraps useState with
-  the future BroadcastChannel interface shape: `useSync(roomId, initialState)`
-  returns `[state, setState]`. Real BroadcastChannel sync is NOT yet
-  implemented — don't assume multi-tab sync works until this is built out.
-- Screen 3 already calls useSync(roomId, ...) instead of raw useState,
-  so wiring in real BroadcastChannel later should only touch this one file.
+## Player identity (implemented)
+- Screen 0 (app/page.tsx) captures a name via text input, stored in
+  sessionStorage under key 'reGamePlayerName' — intentionally per-tab,
+  since each browser tab represents one demo "player".
+- Player type (lib/types.ts) already existed: { name, id, team?, role? }.
+  GameState now also includes `players: Player[]`, initialized empty
+  by createGame().
 
-## Screen 3 status
-- Team/role selection (3.1) is implemented as in-component conditional
-  rendering, not a separate route.
-- Board renders with correct role-based visibility (spymaster sees all
-  colors, operative sees none) — but has NO click interactivity yet.
-  Reveal-on-click, turn logic, and win display are the next iteration.
+## Sync layer (implemented)
+- lib/useSync.ts now uses real BroadcastChannel, scoped to `re-game:${roomId}`.
+  Same signature as before: useSync(roomId, initialState) -> [state, setState].
+  setState updates locally AND broadcasts; incoming messages from other
+  tabs update local state.
+
+## Sync layer — join handshake (implemented)
+useSync now handles late joiners: on mount, a tab broadcasts a
+'requestState' message; existing tabs respond with their current
+GameState as a 'state' message, so a tab opened after others already
+have game/player state gets caught up instead of starting fresh with
+its own randomly-generated board and empty players list.
+
+## Screen 3 status (updated)
+- CodenamesGame.tsx now destructures [game, setGame] from useSync (previously
+  only used [game]).
+- Redirects to '/' if no sessionStorage name is found.
+- Team/role picker writes the player into game.players via setGame — visible
+  live across tabs. A "Teams" section renders players grouped by Red/Blue.
+- Changing team/role after initial pick is still NOT supported — out of
+  scope until a future iteration.
+- Board rendering (getCardDisplay) and role-based visibility unchanged.
+- Note: createGame(WORD_POOL) is currently called inline as the initialState
+  arg to useSync on every render — harmless (useState ignores it after first
+  render) but worth memoizing later if it becomes a real cost.

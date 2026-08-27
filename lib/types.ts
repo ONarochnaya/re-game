@@ -19,6 +19,7 @@ export type GameState = {
   cards: Card[];
   turn: Team;
   winner: Team | null;
+  players: Player[];
 };
 
 export type ScoreboardEntry = {

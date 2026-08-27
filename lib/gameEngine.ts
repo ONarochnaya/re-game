@@ -28,6 +28,7 @@ export function createGame(wordPool: string[]): GameState {
     cards,
     turn: startingTeam,
     winner: null,
+    players: [],
   };
 }
 

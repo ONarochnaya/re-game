@@ -1,10 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { createGame } from "@/lib/gameEngine";
 import { useSync } from "@/lib/useSync";
 import { WORD_POOL } from "@/lib/words";
-import type { Card, GameState, Role, Team } from "@/lib/types";
+import type { Card, Role, Team } from "@/lib/types";
 
 function getCardDisplay(card: Card, myRole: Role): string {
   if (myRole === "spymaster") {
@@ -24,9 +25,41 @@ function getCardDisplay(card: Card, myRole: Role): string {
 }
 
 export default function CodenamesGame({ roomId }: { roomId: string }) {
-  const [game] = useSync(roomId, createGame(WORD_POOL));
+  const router = useRouter();
+  const [game, setGame] = useSync(roomId, createGame(WORD_POOL));
   const [team, setTeam] = useState<Team | null>(null);
   const [role, setRole] = useState<Role | null>(null);
+  const [playerName] = useState<string | null>(() => {
+    if (typeof window === "undefined") return null;
+    return sessionStorage.getItem("reGamePlayerName");
+  });
+
+  useEffect(() => {
+    if (!playerName) {
+      router.replace("/");
+    }
+  }, [playerName, router]);
+
+  useEffect(() => {
+    if (!team || !role || !playerName) return;
+
+    setGame((prev) => {
+      const alreadyJoined = prev.players.some((p) => p.name === playerName);
+      if (alreadyJoined) return prev;
+
+      return {
+        ...prev,
+        players: [
+          ...prev.players,
+          { id: crypto.randomUUID(), name: playerName, team, role },
+        ],
+      };
+    });
+  }, [team, role, playerName, setGame]);
+
+  if (!playerName) {
+    return null;
+  }
 
   if (!team || !role) {
     return (
@@ -81,12 +114,38 @@ export default function CodenamesGame({ roomId }: { roomId: string }) {
     );
   }
 
+  const redPlayers = game.players.filter((p) => p.team === "red");
+  const bluePlayers = game.players.filter((p) => p.team === "blue");
+
   return (
     <main className="flex flex-1 flex-col items-center justify-center gap-4 p-8">
       <h1 className="text-2xl font-semibold">Screen 3: Codenames</h1>
       <p className="text-sm text-zinc-500">
         Room: {roomId} — {team} {role}
       </p>
+
+      <div className="grid w-full max-w-md grid-cols-2 gap-4">
+        <div>
+          <p className="text-sm font-semibold text-red-600">Red</p>
+          <ul className="text-sm">
+            {redPlayers.map((p) => (
+              <li key={p.id}>
+                {p.name} ({p.role === "spymaster" ? "Spymaster" : "Operative"})
+              </li>
+            ))}
+          </ul>
+        </div>
+        <div>
+          <p className="text-sm font-semibold text-blue-600">Blue</p>
+          <ul className="text-sm">
+            {bluePlayers.map((p) => (
+              <li key={p.id}>
+                {p.name} ({p.role === "spymaster" ? "Spymaster" : "Operative"})
+              </li>
+            ))}
+          </ul>
+        </div>
+      </div>
 
       <div className="grid grid-cols-5 gap-2">
         {game.cards.map((card) => (
