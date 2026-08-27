@@ -1,18 +1,24 @@
+export type Team = "red" | "blue";
+
+export type Role = "spymaster" | "operative";
+
 export type Player = {
   name: string;
   id: string;
+  team?: Team;
+  role?: Role;
 };
 
 export type Card = {
   word: string;
-  team: "red" | "blue" | "neutral" | "assassin";
+  team: Team | "neutral" | "assassin";
   revealed: boolean;
 };
 
 export type GameState = {
   cards: Card[];
-  turn: "red" | "blue";
-  winner: "red" | "blue" | null;
+  turn: Team;
+  winner: Team | null;
 };
 
 export type ScoreboardEntry = {
