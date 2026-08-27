@@ -122,6 +122,8 @@ export default function CodenamesGame({roomId}: { roomId: string }) {
     const clueHistory = [...game.clueHistory].reverse();
 
     function handleGiveClue() {
+        if (!team || !playerName) return;
+
         const trimmedWord = clueWord.trim();
         const parsedNumber = Number(clueNumber);
         const isValidNumber =
