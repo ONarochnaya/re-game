@@ -114,3 +114,30 @@ its own randomly-generated board and empty players list.
 - Note: createGame(WORD_POOL) is currently called inline as the initialState
   arg to useSync on every render — harmless (useState ignores it after first
   render) but worth memoizing later if it becomes a real cost.
+
+  ## The fonts and colours
+- Typography
+- Two font families: Fredoka for headings, Outfit for body text.
+
+- Style	Font	Size	Weight
+- H2	Fredoka	48px	Bold (700)
+- H3	Fredoka	40px	Bold (700)
+- H3 (small)	Fredoka	32px	Bold (700)
+- Large Bold	Fredoka	24px	Bold (700)
+- Large	Fredoka	24px	Regular (400)
+- Body Bold	Outfit	16px	Bold (700)
+- Body	Outfit	16px	Regular (400)
+
+- Colours
+- Each colour has four shades, darkest to lightest:
+
+- Dark / Grey: #1F2B38 · #65707B · #D1DCE5 · #F5F7F9
+
+- Cyan: #5FE8EC · #90EFF2 · #C0F6F7 · #F1FDFD
+
+- Purple: #8B5CF6 · #AE8EF9 · #D1BFFB · #F5F1FE
+
+- Pink: #EC4899 · #F280B8 · #F8B9D8 · #FEF1F7
+
+- Green: #10B981 · #5BD0A9 · #A6E7D1 · #F1FEFA
+
