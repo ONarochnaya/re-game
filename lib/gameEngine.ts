@@ -1,4 +1,4 @@
-import type { Card, GameState, Team } from "./types";
+import type { Card, Clue, GameState, Team } from "./types";
 
 function pickRandom<T>(pool: T[], count: number): T[] {
   const shuffled = [...pool].sort(() => Math.random() - 0.5);
@@ -29,6 +29,23 @@ export function createGame(wordPool: string[]): GameState {
     turn: startingTeam,
     winner: null,
     players: [],
+    clueHistory: [],
+  };
+}
+
+export function addClue(
+  state: GameState,
+  clue: Omit<Clue, "id" | "timestamp">
+): GameState {
+  const newClue: Clue = {
+    ...clue,
+    id: crypto.randomUUID(),
+    timestamp: Date.now(),
+  };
+
+  return {
+    ...state,
+    clueHistory: [...state.clueHistory, newClue],
   };
 }
 

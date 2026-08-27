@@ -15,11 +15,21 @@ export type Card = {
   revealed: boolean;
 };
 
+export type Clue = {
+  id: string;
+  team: Team;
+  playerName: string;
+  word: string;
+  number: number;
+  timestamp: number;
+};
+
 export type GameState = {
   cards: Card[];
   turn: Team;
   winner: Team | null;
   players: Player[];
+  clueHistory: Clue[];
 };
 
 export type ScoreboardEntry = {
