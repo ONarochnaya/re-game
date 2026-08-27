@@ -44,11 +44,8 @@ export default function LobbyPage() {
     <main className="min-h-screen bg-zinc-50 px-6 py-16 text-zinc-900">
       <div className="mx-auto flex max-w-6xl flex-col items-center gap-10">
         <header className="text-center">
-          <p className="text-xs font-medium uppercase tracking-[0.3em] text-zinc-500">
-            Welcome
-          </p>
           <h1 className="mt-4 text-4xl font-bold tracking-tight sm:text-5xl">
-            re-game
+            Pick a game to play
           </h1>
         </header>
 
