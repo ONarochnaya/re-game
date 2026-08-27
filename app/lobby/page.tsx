@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import codenamesImage from "./codenames.png";
 import simpleLeaderboard from "./simple-leaderboard.png";
+import twoTruthsImage from "./twotruths.png";
 
 const placeholderCards = [
   {
@@ -13,7 +14,12 @@ const placeholderCards = [
     image: codenamesImage.src,
     route: "codenames",
   },
-  { title: "Placeholder 2", tone: "bg-zinc-300", route: "twotruths1lie" },
+  {
+    title: "Placeholder 2",
+    tone: "bg-zinc-300",
+    image: twoTruthsImage.src,
+    route: "twotruths1lie",
+  },
   { title: "Placeholder 3", tone: "bg-zinc-200" },
   { title: "Placeholder 4", tone: "bg-zinc-300" },
   { title: "Placeholder 5", tone: "bg-zinc-200" },
