@@ -193,130 +193,136 @@ export default function CodenamesGame({roomId}: { roomId: string }) {
     }
 
     return (
-        <main className="flex flex-1 flex-col items-center justify-center gap-4 p-8">
-            {/*<h1 className="font-display text-[32px] font-bold text-[#1F2B38]">Screen 3: Codenames</h1>*/}
-            {/*<p className="text-sm text-[#65707B]">*/}
-            {/*    Room: {roomId} — {team} {role}*/}
-            {/*</p>*/}
+        <main className="flex flex-1 items-center justify-center p-8">
+            <div className="flex items-start gap-8">
+                <div className="flex w-full max-w-md flex-col gap-4">
+                    {/*<h1 className="font-display text-[32px] font-bold text-[#1F2B38]">Screen 3: Codenames</h1>*/}
+                    {/*<p className="text-sm text-[#65707B]">*/}
+                    {/*    Room: {roomId} — {team} {role}*/}
+                    {/*</p>*/}
 
-            <div className="grid w-full max-w-md grid-cols-2 gap-4">
-                <div>
-                    <p className="font-display text-2xl font-bold text-[#48B500]">Green</p>
-                    <ul className="text-sm">
-                        {redPlayers.map((p) => (
-                            <li key={p.id}>
-                                {p.name === playerName ? `You: ${p.name}` : p.name} (
-                                {p.role === "spymaster" ? "Spymaster" : "Operative"})
-                            </li>
-                        ))}
-                    </ul>
-                </div>
-                <div>
-                    <p className="font-display text-2xl font-bold text-[#0069A1]">Blue</p>
-                    <ul className="text-sm">
-                        {bluePlayers.map((p) => (
-                            <li key={p.id}>
-                                {p.name === playerName ? `You: ${p.name}` : p.name} (
-                                {p.role === "spymaster" ? "Spymaster" : "Operative"})
-                            </li>
-                        ))}
-                    </ul>
-                </div>
-            </div>
-
-            <div className="flex gap-6 text-sm">
-                <p className="font-bold text-[#48B500]">
-                    Green: {redRevealedCount} / {redCards.length} revealed
-                </p>
-                <p className="font-bold text-[#0069A1]">
-                    Blue: {blueRevealedCount} / {blueCards.length} revealed
-                </p>
-            </div>
-
-            {game.winner && (
-                <p className="font-display text-2xl font-bold text-[#10B981]">
-                    🎉 {game.winner === "red" ? "Green" : "Blue"} team wins!
-                </p>
-            )}
-
-            {role === "spymaster" && (
-                <div className="flex flex-col items-center gap-2">
-                    <p className="font-display text-2xl font-bold text-[#1F2B38]">Give a clue</p>
-                    <div className="flex gap-2">
-                        <input
-                            type="text"
-                            value={clueWord}
-                            onChange={(e) => setClueWord(e.target.value)}
-                            placeholder="Word"
-                            className="rounded border border-[#D1DCE5] px-3 py-1"
-                        />
-                        <input
-                            type="text"
-                            value={clueNumber}
-                            onChange={(e) => setClueNumber(e.target.value)}
-                            placeholder="Number"
-                            className="w-20 rounded border border-[#D1DCE5] px-3 py-1"
-                        />
-                        <button
-                            onClick={handleGiveClue}
-                            className="rounded bg-[#8B5CF6] px-4 py-1 font-bold text-white"
-                        >
-                            Give Clue
-                        </button>
-                    </div>
-                    {clueError && <p className="text-sm text-[#EC4899]">{clueError}</p>}
-                </div>
-            )}
-
-            <div className="flex flex-col items-center gap-2">
-                <p className="font-display text-2xl font-bold text-[#1F2B38]">Clue History</p>
-                <ul className="text-sm">
-                    {clueHistory.map((clue) => (
-                        <li key={clue.id}>
-                            <span
-                                className={clue.team === "red" ? "text-[#48B500]" : "text-[#0069A1]"}
-                            >
-                                {clue.team === "red" ? "Green" : "Blue"}
-                            </span>
-                            {" — "}
-                            {clue.playerName === playerName ? `You: ${clue.playerName}` : clue.playerName}
-                            : {clue.word.toUpperCase()} ({clue.number})
-                        </li>
-                    ))}
-                </ul>
-            </div>
-
-            <div className="grid grid-cols-5 gap-2">
-                {game.cards.map((card, index) => {
-                    const isSelected = !card.revealed && selectedIndices.has(index);
-                    const isClickable = role === "operative" && !card.revealed;
-
-                    return (
-                        <div
-                            key={card.word}
-                            onClick={isClickable ? () => toggleCardSelection(index) : undefined}
-                            className={`flex aspect-square w-24 items-center justify-center rounded p-2 text-center text-sm font-medium ${getCardDisplay(
-                                card,
-                                role
-                            )} ${isClickable ? "cursor-pointer" : ""} ${
-                                isSelected ? "ring-2 ring-[#8B5CF6]" : ""
-                            }`}
-                        >
-                            {card.word}
+                    <div className="grid w-full grid-cols-2 gap-4">
+                        <div>
+                            <p className="font-display text-2xl font-bold text-[#48B500]">Green</p>
+                            <ul className="text-sm">
+                                {redPlayers.map((p) => (
+                                    <li key={p.id}>
+                                        {p.name === playerName ? `You: ${p.name}` : p.name} (
+                                        {p.role === "spymaster" ? "Spymaster" : "Operative"})
+                                    </li>
+                                ))}
+                            </ul>
                         </div>
-                    );
-                })}
-            </div>
+                        <div>
+                            <p className="font-display text-2xl font-bold text-[#0069A1]">Blue</p>
+                            <ul className="text-sm">
+                                {bluePlayers.map((p) => (
+                                    <li key={p.id}>
+                                        {p.name === playerName ? `You: ${p.name}` : p.name} (
+                                        {p.role === "spymaster" ? "Spymaster" : "Operative"})
+                                    </li>
+                                ))}
+                            </ul>
+                        </div>
+                    </div>
 
-            {role === "operative" && (
-                <button
-                    onClick={handleReveal}
-                    disabled={selectedIndices.size === 0}
-                    className="rounded bg-[#10B981] px-4 py-2 font-bold text-white disabled:opacity-40"
-                >
-                    Reveal
-                </button>
-            )}
+                    <div className="flex gap-6 text-sm">
+                        <p className="font-bold text-[#48B500]">
+                            Green: {redRevealedCount} / {redCards.length} revealed
+                        </p>
+                        <p className="font-bold text-[#0069A1]">
+                            Blue: {blueRevealedCount} / {blueCards.length} revealed
+                        </p>
+                    </div>
+
+                    {game.winner && (
+                        <p className="font-display text-2xl font-bold text-[#10B981]">
+                            🎉 {game.winner === "red" ? "Green" : "Blue"} team wins!
+                        </p>
+                    )}
+
+                    {role === "spymaster" && (
+                        <div className="flex flex-col gap-2">
+                            <p className="font-display text-2xl font-bold text-[#1F2B38]">Give a clue</p>
+                            <div className="flex gap-2">
+                                <input
+                                    type="text"
+                                    value={clueWord}
+                                    onChange={(e) => setClueWord(e.target.value)}
+                                    placeholder="Word"
+                                    className="rounded border border-[#D1DCE5] px-3 py-1"
+                                />
+                                <input
+                                    type="text"
+                                    value={clueNumber}
+                                    onChange={(e) => setClueNumber(e.target.value)}
+                                    placeholder="Number"
+                                    className="w-20 rounded border border-[#D1DCE5] px-3 py-1"
+                                />
+                                <button
+                                    onClick={handleGiveClue}
+                                    className="rounded bg-[#8B5CF6] px-4 py-1 font-bold text-white"
+                                >
+                                    Give Clue
+                                </button>
+                            </div>
+                            {clueError && <p className="text-sm text-[#EC4899]">{clueError}</p>}
+                        </div>
+                    )}
+
+                    <div className="flex flex-col gap-2">
+                        <p className="font-display text-2xl font-bold text-[#1F2B38]">Clue History</p>
+                        <ul className="text-sm">
+                            {clueHistory.map((clue) => (
+                                <li key={clue.id}>
+                                    <span
+                                        className={clue.team === "red" ? "text-[#48B500]" : "text-[#0069A1]"}
+                                    >
+                                        {clue.team === "red" ? "Green" : "Blue"}
+                                    </span>
+                                    {" — "}
+                                    {clue.playerName === playerName ? `You: ${clue.playerName}` : clue.playerName}
+                                    : {clue.word.toUpperCase()} ({clue.number})
+                                </li>
+                            ))}
+                        </ul>
+                    </div>
+
+                    {role === "operative" && (
+                        <button
+                            onClick={handleReveal}
+                            disabled={selectedIndices.size === 0}
+                            className="self-start rounded bg-[#10B981] px-4 py-2 font-bold text-white disabled:opacity-40"
+                        >
+                            Reveal
+                        </button>
+                    )}
+                </div>
+
+                <div className="shrink-0">
+                    <div className="grid grid-cols-5 gap-2">
+                        {game.cards.map((card, index) => {
+                            const isSelected = !card.revealed && selectedIndices.has(index);
+                            const isClickable = role === "operative" && !card.revealed;
+
+                            return (
+                                <div
+                                    key={card.word}
+                                    onClick={isClickable ? () => toggleCardSelection(index) : undefined}
+                                    className={`flex aspect-square w-24 items-center justify-center rounded p-2 text-center text-sm font-medium ${getCardDisplay(
+                                        card,
+                                        role
+                                    )} ${isClickable ? "cursor-pointer" : ""} ${
+                                        isSelected ? "ring-2 ring-[#8B5CF6]" : ""
+                                    }`}
+                                >
+                                    {card.word}
+                                </div>
+                            );
+                        })}
+                    </div>
+                </div>
+            </div>
         </main>
     );
 }
