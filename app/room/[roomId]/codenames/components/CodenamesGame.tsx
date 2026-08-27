@@ -2,7 +2,7 @@
 
 import {useEffect, useState} from "react";
 import {useRouter} from "next/navigation";
-import {addClue, createGame, revealMultiple} from "@/lib/gameEngine";
+import {addClue, checkWinCondition, createGame, revealMultiple} from "@/lib/gameEngine";
 import {useSync} from "@/lib/useSync";
 import {WORD_POOL} from "@/lib/words";
 import type {Card, Role, Team} from "@/lib/types";
@@ -135,6 +135,11 @@ export default function CodenamesGame({roomId}: { roomId: string }) {
     const bluePlayers = game.players.filter((p) => p.team === "blue");
     const clueHistory = [...game.clueHistory].reverse();
 
+    const redCards = game.cards.filter((c) => c.team === "red");
+    const blueCards = game.cards.filter((c) => c.team === "blue");
+    const redRevealedCount = redCards.filter((c) => c.revealed).length;
+    const blueRevealedCount = blueCards.filter((c) => c.revealed).length;
+
     function handleGiveClue() {
         if (!team || !playerName) return;
 
@@ -175,7 +180,11 @@ export default function CodenamesGame({roomId}: { roomId: string }) {
     function handleReveal() {
         if (selectedIndices.size === 0) return;
 
-        setGame((prev) => revealMultiple(prev, Array.from(selectedIndices)));
+        setGame((prev) => {
+            const revealed = revealMultiple(prev, Array.from(selectedIndices));
+            const winner = checkWinCondition(revealed);
+            return {...revealed, winner};
+        });
         setSelectedIndices(new Set());
     }
 
@@ -210,6 +219,21 @@ export default function CodenamesGame({roomId}: { roomId: string }) {
                     </ul>
                 </div>
             </div>
+
+            <div className="flex gap-6 text-sm">
+                <p className="font-medium text-red-600">
+                    Red: {redRevealedCount} / {redCards.length} revealed
+                </p>
+                <p className="font-medium text-blue-600">
+                    Blue: {blueRevealedCount} / {blueCards.length} revealed
+                </p>
+            </div>
+
+            {game.winner && (
+                <p className="text-lg font-semibold">
+                    🎉 {game.winner === "red" ? "Red" : "Blue"} team wins!
+                </p>
+            )}
 
             {role === "spymaster" && (
                 <div className="flex flex-col items-center gap-2">
