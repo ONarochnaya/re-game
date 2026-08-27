@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
 import simpleLeaderboard from "./simple-leaderboard.png";
 
 const placeholderCards = [
@@ -15,9 +16,28 @@ const placeholderCards = [
 export default function LobbyPage() {
   const router = useRouter();
 
+  // Lazy initializer (guarded for SSR, where window is undefined) instead of
+  // reading localStorage + setState in an effect — consistent with how
+  // playerName is read in CodenamesGame.tsx, and avoids a set-state-in-effect
+  // cascading render.
+  const [currentRoomId] = useState<string | null>(() => {
+    if (typeof window === "undefined") return null;
+    return localStorage.getItem("reGameCurrentRoom");
+  });
+
   function handlePlayCodenames() {
     const roomId = crypto.randomUUID();
+    // Unlike the player name (sessionStorage, per-tab), the room id is
+    // intentionally in localStorage: it needs to be shared across tabs in the
+    // same browser, which is what lets a second tab "join" instead of
+    // manually pasting a URL.
+    localStorage.setItem("reGameCurrentRoom", roomId);
     router.push(`/room/${roomId}/codenames`);
+  }
+
+  function handleJoinCurrentGame() {
+    if (!currentRoomId) return;
+    router.push(`/room/${currentRoomId}/codenames`);
   }
 
   return (
@@ -62,6 +82,14 @@ export default function LobbyPage() {
           >
             Play Codenames
           </button>
+          {currentRoomId && (
+            <button
+              onClick={handleJoinCurrentGame}
+              className="rounded border border-zinc-300 px-4 py-2 text-zinc-900"
+            >
+              Join current game
+            </button>
+          )}
           <Link href="/scoreboard" className="underline">
             View Scoreboard
           </Link>

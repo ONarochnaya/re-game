@@ -91,6 +91,17 @@ GameState as a 'state' message, so a tab opened after others already
 have game/player state gets caught up instead of starting fresh with
 its own randomly-generated board and empty players list.
 
+## Current room pointer (implemented)
+- Screen 1 (app/lobby/page.tsx) stores the active roomId in localStorage
+  under key 'reGameCurrentRoom' when "Play Codenames" is clicked —
+  intentionally localStorage (not sessionStorage), since it needs to be
+  shared across tabs in the same browser, unlike the per-tab player name.
+- If a stored roomId exists, Screen 1 shows a "Join current game" option
+  alongside "Play Codenames" so a second tab can join without a
+  copy-pasted URL.
+- Starting a new game always overwrites the stored roomId — no explicit
+  "end game"/reset flow exists, out of scope for this hackathon.
+
 ## Screen 3 status (updated)
 - CodenamesGame.tsx now destructures [game, setGame] from useSync (previously
   only used [game]).
