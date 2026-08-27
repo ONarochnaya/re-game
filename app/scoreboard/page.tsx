@@ -12,7 +12,7 @@ export default function ScoreboardPage() {
         <img
           src={scoreboardCard.src}
           alt="Scoreboard card"
-          className="w-full max-w-3xl rounded-2xl border border-zinc-200 bg-white shadow-lg"
+          className="w-full max-w-3xl rounded-2xl"
         />
       </div>
     </main>
