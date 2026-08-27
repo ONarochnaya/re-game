@@ -31,4 +31,26 @@ export function createGame(wordPool: string[]): GameState {
   };
 }
 
-// Future functions here: revealCard, checkWinCondition, passTurn — added in a later iteration.
+export function revealCard(state: GameState, index: number): GameState {
+  // TODO: implement in next iteration — mark cards[index] as revealed, and if it
+  // belongs to the assassin or the other team, end the current player's turn.
+  return state;
+}
+
+export function revealMultiple(state: GameState, indices: number[]): GameState {
+  // TODO: implement in next iteration — apply revealCard for each index in order,
+  // stopping early if a reveal ends the turn (wrong team or assassin), to support
+  // the "reveal several guesses at once" flow from the real game rules.
+  return state;
+}
+
+export function checkWinCondition(state: GameState): Team | null {
+  // TODO: implement in next iteration — a team wins once all of its cards are
+  // revealed; the assassin being revealed should hand the win to the other team.
+  return state.winner;
+}
+
+export function passTurn(state: GameState): GameState {
+  // TODO: implement in next iteration — flip state.turn to the other team.
+  return state;
+}

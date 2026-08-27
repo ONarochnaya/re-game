@@ -53,3 +53,34 @@ do not add "security" for this, it's explicitly out of scope for now.
 - Games other than Codenames
 - Persistence across page refresh / browser restart
 - Reconnect/disconnect handling
+
+## Codenames data & logic (implemented)
+- Word pool lives in `lib/words.ts` — a static array of 40-50 words,
+  createGame() randomly picks 25 from it. Don't regenerate or duplicate
+  this list elsewhere.
+- Pure game logic lives in `lib/gameEngine.ts`:
+    - `createGame(wordPool)` — generates a full GameState (board + team
+      distribution + starting turn). Implemented.
+    - `revealCard`, `revealMultiple`, `checkWinCondition`, `passTurn` —
+      STUBBED ONLY, not yet implemented (return state unchanged). Do not
+      assume these work — check before building UI that depends on them.
+    - This file has no React, no side effects, no sync calls — keep it
+      that way when extending it.
+- Role-based card rendering goes through a single helper function
+  (`getCardDisplay` or similar) in the Codenames page component —
+  don't inline color/reveal logic in JSX, extend the helper instead.
+
+## Sync layer (stubbed, not implemented)
+- `lib/useSync.ts` exists as a stub — currently just wraps useState with
+  the future BroadcastChannel interface shape: `useSync(roomId, initialState)`
+  returns `[state, setState]`. Real BroadcastChannel sync is NOT yet
+  implemented — don't assume multi-tab sync works until this is built out.
+- Screen 3 already calls useSync(roomId, ...) instead of raw useState,
+  so wiring in real BroadcastChannel later should only touch this one file.
+
+## Screen 3 status
+- Team/role selection (3.1) is implemented as in-component conditional
+  rendering, not a separate route.
+- Board renders with correct role-based visibility (spymaster sees all
+  colors, operative sees none) — but has NO click interactivity yet.
+  Reveal-on-click, turn logic, and win display are the next iteration.
