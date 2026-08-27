@@ -59,4 +59,10 @@ export const WORD_POOL: string[] = [
     "Campaign",
     "Trust",
     "Agent",
+    "Buyback",
+    "Harvesting",
+    "Marketplace",
+    "Reuse",
+    "Recycle",
+    "Reduce",
 ];

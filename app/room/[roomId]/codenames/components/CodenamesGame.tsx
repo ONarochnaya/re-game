@@ -81,8 +81,8 @@ export default function CodenamesGame({roomId}: { roomId: string }) {
     if (!team || !role) {
         return (
             <main className="flex flex-1 flex-col items-center justify-center gap-6 p-8">
-                <h1 className="font-display text-[32px] font-bold text-[#1F2B38]">Screen 3: Codenames</h1>
-                <p className="text-sm text-[#65707B]">Room: {roomId}</p>
+                <h1 className="font-display text-[32px] font-bold text-[#1F2B38]">Codenames</h1>
+                {/*<p className="text-sm text-[#65707B]">Room: {roomId}</p>*/}
 
                 <div className="flex flex-col items-center gap-2">
                     <p className="font-display text-2xl font-bold text-[#1F2B38]">Pick a team</p>
@@ -194,10 +194,10 @@ export default function CodenamesGame({roomId}: { roomId: string }) {
 
     return (
         <main className="flex flex-1 flex-col items-center justify-center gap-4 p-8">
-            <h1 className="font-display text-[32px] font-bold text-[#1F2B38]">Screen 3: Codenames</h1>
-            <p className="text-sm text-[#65707B]">
-                Room: {roomId} — {team} {role}
-            </p>
+            {/*<h1 className="font-display text-[32px] font-bold text-[#1F2B38]">Screen 3: Codenames</h1>*/}
+            {/*<p className="text-sm text-[#65707B]">*/}
+            {/*    Room: {roomId} — {team} {role}*/}
+            {/*</p>*/}
 
             <div className="grid w-full max-w-md grid-cols-2 gap-4">
                 <div>
