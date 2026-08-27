@@ -3,10 +3,11 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import codenamesImage from "./codenames.png";
 import simpleLeaderboard from "./simple-leaderboard.png";
 
 const placeholderCards = [
-  { title: "Placeholder 1", tone: "bg-zinc-200" },
+  { title: "rebuy Codenames", tone: "bg-zinc-200", image: codenamesImage.src },
   { title: "Placeholder 2", tone: "bg-zinc-300" },
   { title: "Placeholder 3", tone: "bg-zinc-200" },
   { title: "Placeholder 4", tone: "bg-zinc-300" },
@@ -50,12 +51,36 @@ export default function LobbyPage() {
         </header>
 
         <section className="grid w-full grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-5">
-          {placeholderCards.map(({ title, tone }) => (
-            <div key={title} className="flex flex-col items-center gap-3">
+          {placeholderCards.map(({ title, tone, image }) => (
+            <div
+              key={title}
+              className={`flex flex-col items-center gap-3 ${image ? "cursor-pointer" : ""}`}
+              onClick={image ? handlePlayCodenames : undefined}
+              onKeyDown={
+                image
+                  ? (event) => {
+                      if (event.key === "Enter" || event.key === " ") {
+                        event.preventDefault();
+                        handlePlayCodenames();
+                      }
+                    }
+                  : undefined
+              }
+              role={image ? "link" : undefined}
+              tabIndex={image ? 0 : undefined}
+            >
               <div
-                className={`flex h-36 w-full items-center justify-center rounded-2xl border border-zinc-300 ${tone} shadow-sm`}
+                className={`flex aspect-square w-full items-center justify-center overflow-hidden rounded-2xl border border-zinc-300 ${tone} shadow-sm`}
               >
-                <span className="text-sm font-medium text-zinc-600">Image</span>
+                {image ? (
+                  <img
+                    src={image}
+                    alt="rebuy Codenames"
+                    className="h-full w-full object-cover"
+                  />
+                ) : (
+                  <span className="text-sm font-medium text-zinc-600">Image</span>
+                )}
               </div>
               <p className="text-sm font-medium text-zinc-700">{title}</p>
             </div>
