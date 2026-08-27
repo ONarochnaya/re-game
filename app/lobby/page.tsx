@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import scoreboardCard from "./scoreboard-card.png";
 
 const placeholderCards = [
   { title: "Placeholder 1", tone: "bg-zinc-200" },
@@ -46,9 +47,9 @@ export default function LobbyPage() {
 
         <div className="flex w-full justify-center">
           <img
-            src="/scoreboard-card.png"
+            src={scoreboardCard.src}
             alt="Scoreboard card"
-            className="w-full max-w-2xl rounded-2xl border border-zinc-200 bg-white shadow-lg"
+            className="w-full max-w-2xl rounded-2xl"
           />
         </div>
 
