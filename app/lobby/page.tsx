@@ -7,8 +7,13 @@ import codenamesImage from "./codenames.png";
 import simpleLeaderboard from "./simple-leaderboard.png";
 
 const placeholderCards = [
-  { title: "rebuy Codenames", tone: "bg-zinc-200", image: codenamesImage.src },
-  { title: "Placeholder 2", tone: "bg-zinc-300" },
+  {
+    title: "rebuy Codenames",
+    tone: "bg-zinc-200",
+    image: codenamesImage.src,
+    route: "codenames",
+  },
+  { title: "Placeholder 2", tone: "bg-zinc-300", route: "twotruths1lie" },
   { title: "Placeholder 3", tone: "bg-zinc-200" },
   { title: "Placeholder 4", tone: "bg-zinc-300" },
   { title: "Placeholder 5", tone: "bg-zinc-200" },
@@ -36,6 +41,12 @@ export default function LobbyPage() {
     router.push(`/room/${roomId}/codenames`);
   }
 
+  function handlePlayTwoTruths1Lie() {
+    const roomId = crypto.randomUUID();
+    localStorage.setItem("reGameCurrentRoom", roomId);
+    router.push(`/room/${roomId}/twotruths1lie`);
+  }
+
   function handleJoinCurrentGame() {
     if (!currentRoomId) return;
     router.push(`/room/${currentRoomId}/codenames`);
@@ -51,23 +62,33 @@ export default function LobbyPage() {
         </header>
 
         <section className="grid w-full grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-5">
-          {placeholderCards.map(({ title, tone, image }) => (
+          {placeholderCards.map(({ title, tone, image, route }) => (
             <div
               key={title}
-              className={`flex flex-col items-center gap-3 ${image ? "cursor-pointer" : ""}`}
-              onClick={image ? handlePlayCodenames : undefined}
+              className={`flex flex-col items-center gap-3 ${route ? "cursor-pointer" : ""}`}
+              onClick={
+                route === "codenames"
+                  ? handlePlayCodenames
+                  : route === "twotruths1lie"
+                    ? handlePlayTwoTruths1Lie
+                    : undefined
+              }
               onKeyDown={
-                image
+                route
                   ? (event) => {
                       if (event.key === "Enter" || event.key === " ") {
                         event.preventDefault();
-                        handlePlayCodenames();
+                        if (route === "codenames") {
+                          handlePlayCodenames();
+                        } else if (route === "twotruths1lie") {
+                          handlePlayTwoTruths1Lie();
+                        }
                       }
                     }
                   : undefined
               }
-              role={image ? "link" : undefined}
-              tabIndex={image ? 0 : undefined}
+              role={route ? "link" : undefined}
+              tabIndex={route ? 0 : undefined}
             >
               <div
                 className={`flex aspect-square w-full items-center justify-center overflow-hidden rounded-2xl border border-[#D1DCE5] ${tone} shadow-sm`}
