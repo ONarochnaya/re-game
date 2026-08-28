@@ -11,9 +11,9 @@ function getCardDisplay(card: Card, myRole: Role): string {
     if (card.revealed) {
         switch (card.team) {
             case "red":
-                return "bg-[#4FC654] text-[#ffffff] border-2 border-[#4FC654]";
+                return "bg-[#067302] text-[#ffffff] border-2 border-[#067302]";
             case "blue":
-                return "bg-[#4692BC] text-[#ffffff] border-2 border-[#4692BC]";
+                return "bg-[#004970] text-[#ffffff] border-2 border-[#004970]";
             case "neutral":
                 return "bg-[#F5F7F9] text-[#65707B] border-2 border-[#D1DCE5]";
             case "assassin":
@@ -309,7 +309,9 @@ export default function CodenamesGame({roomId}: { roomId: string }) {
                                 <div
                                     key={card.word}
                                     onClick={isClickable ? () => toggleCardSelection(index) : undefined}
-                                    className={`flex aspect-square w-24 items-center justify-center rounded p-2 text-center text-sm font-medium ${getCardDisplay(
+                                    className={`flex aspect-square w-24 items-center justify-center rounded p-2 text-center text-sm ${
+                                        card.revealed ? "font-bold" : "font-medium"
+                                    } ${getCardDisplay(
                                         card,
                                         role
                                     )} ${isClickable ? "cursor-pointer" : ""} ${
