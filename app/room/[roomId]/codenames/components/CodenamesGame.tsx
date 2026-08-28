@@ -9,6 +9,19 @@ import type {Card, Role, Team} from "@/lib/types";
 
 function getCardDisplay(card: Card, myRole: Role): string {
     if (card.revealed) {
+        if (myRole === "operative") {
+            switch (card.team) {
+                case "red":
+                    return "bg-[#48B500] text-white border-2 border-[#D1DCE5]";
+                case "blue":
+                    return "bg-[#0069A1] text-white border-2 border-[#D1DCE5]";
+                case "neutral":
+                    return "bg-[#F5F7F9] text-[#65707B] border-2 border-[#D1DCE5]";
+                case "assassin":
+                    return "bg-[#65707B] text-white border-2 border-[#D1DCE5]";
+            }
+        }
+
         switch (card.team) {
             case "red":
                 return "bg-[#ffffff] text-[#339E38] border-2 border-[#339E38]";
