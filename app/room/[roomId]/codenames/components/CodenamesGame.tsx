@@ -11,9 +11,9 @@ function getCardDisplay(card: Card, myRole: Role): string {
     if (card.revealed) {
         switch (card.team) {
             case "red":
-                return "bg-[#48B500]/20 text-[#48B500] border-2 border-[#D1DCE5]";
+                return "bg-[#4FC654] text-[#ffffff] border-2 border-[#4FC654]";
             case "blue":
-                return "bg-[#0069A1]/20 text-[#0069A1] border-2 border-[#D1DCE5]";
+                return "bg-[#4692BC] text-[#ffffff] border-2 border-[#4692BC]";
             case "neutral":
                 return "bg-[#F5F7F9] text-[#65707B] border-2 border-[#D1DCE5]";
             case "assassin":
