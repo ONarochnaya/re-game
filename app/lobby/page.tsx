@@ -145,7 +145,7 @@ export default function LobbyPage() {
                     </div>
                   )}
                 </div>
-                <p className="text-sm font-bold text-[#1F2B38]">{title}</p>
+                <p className="font-sans text-2xl font-bold text-[#1F2B38]">{title}</p>
               </div>
             );
           })}
@@ -162,7 +162,7 @@ export default function LobbyPage() {
         </div>
 
         <div className="flex flex-col items-center gap-4">
-          <Link href="/scoreboard" className="font-bold text-[#EC4899] underline decoration-[#F280B8] underline-offset-4">
+          <Link href="/scoreboard" className="font-sans text-base font-bold text-[#EC4899] underline decoration-[#F280B8] underline-offset-4">
             View Scoreboard
           </Link>
         </div>

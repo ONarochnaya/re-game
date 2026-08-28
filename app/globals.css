@@ -8,6 +8,8 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --font-display: var(--font-fredoka);
+  --font-sans: var(--font-outfit);
 }
 
 body {
