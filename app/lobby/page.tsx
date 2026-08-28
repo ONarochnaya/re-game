@@ -7,9 +7,27 @@ import codenamesImage from "./codenames.png";
 import simpleLeaderboard from "./simple-leaderboard.png";
 import twoTruthsImage from "./twotruths.png";
 
-const placeholderCards = [
+type GameRoute = "codenames" | "twotruths1lie" | "justone";
+
+// Persisted alongside the room id so "Join current game" can route to the
+// right game — previously this only ever assumed Codenames.
+type CurrentRoom = { roomId: string; route: GameRoute };
+
+// Tiles in this set show a hover overlay with separate "Play" / "Join
+// current game" actions instead of creating a fresh room on every click —
+// that's what makes joining an in-progress room possible.
+const JOINABLE_ROUTES: GameRoute[] = ["codenames", "justone"];
+
+const placeholderCards: {
+  title: string;
+  playLabel?: string;
+  tone: string;
+  image?: string;
+  route?: GameRoute;
+}[] = [
   {
     title: "rebuy Codenames",
+    playLabel: "Play Codenames",
     tone: "bg-zinc-200",
     image: codenamesImage.src,
     route: "codenames",
@@ -22,6 +40,7 @@ const placeholderCards = [
   },
   {
     title: "Just One",
+    playLabel: "Play Just One",
     tone: "bg-zinc-200",
     route: "justone",
   },
@@ -34,36 +53,33 @@ export default function LobbyPage() {
   // reading localStorage + setState in an effect — consistent with how
   // playerName is read in CodenamesGame.tsx, and avoids a set-state-in-effect
   // cascading render.
-  const [currentRoomId] = useState<string | null>(() => {
+  const [currentRoom] = useState<CurrentRoom | null>(() => {
     if (typeof window === "undefined") return null;
-    return localStorage.getItem("reGameCurrentRoom");
+    const stored = localStorage.getItem("reGameCurrentRoom");
+    if (!stored) return null;
+    try {
+      return JSON.parse(stored) as CurrentRoom;
+    } catch {
+      // Pre-existing plain-roomId value from before this key held JSON —
+      // there's no way to recover which game it was for, so treat it as no
+      // current room rather than crashing the lobby.
+      return null;
+    }
   });
 
-  function handlePlayCodenames() {
+  function playNewRoom(route: GameRoute) {
     const roomId = crypto.randomUUID();
-    // Unlike the player name (sessionStorage, per-tab), the room id is
-    // intentionally in localStorage: it needs to be shared across tabs in the
-    // same browser, which is what lets a second tab "join" instead of
+    // Unlike the player name (sessionStorage, per-tab), the current room is
+    // intentionally in localStorage: it needs to be shared across tabs in
+    // the same browser, which is what lets a second tab join instead of
     // manually pasting a URL.
-    localStorage.setItem("reGameCurrentRoom", roomId);
-    router.push(`/room/${roomId}/codenames`);
-  }
-
-  function handlePlayTwoTruths1Lie() {
-    const roomId = crypto.randomUUID();
-    localStorage.setItem("reGameCurrentRoom", roomId);
-    router.push(`/room/${roomId}/twotruths1lie`);
-  }
-
-  function handlePlayJustOne() {
-    const roomId = crypto.randomUUID();
-    localStorage.setItem("reGameCurrentRoom", roomId);
-    router.push(`/room/${roomId}/justone`);
+    localStorage.setItem("reGameCurrentRoom", JSON.stringify({ roomId, route }));
+    router.push(`/room/${roomId}/${route}`);
   }
 
   function handleJoinCurrentGame() {
-    if (!currentRoomId) return;
-    router.push(`/room/${currentRoomId}/codenames`);
+    if (!currentRoom) return;
+    router.push(`/room/${currentRoom.roomId}/${currentRoom.route}`);
   }
 
   return (
@@ -76,68 +92,63 @@ export default function LobbyPage() {
         </header>
 
         <section className="mx-auto grid w-full max-w-4xl grid-cols-1 gap-6 sm:grid-cols-3">
-          {placeholderCards.map(({ title, tone, image, route }) => (
-            <div
-              key={title}
-              className={`flex flex-col items-center gap-3 ${route && route !== "codenames" ? "cursor-pointer" : ""}`}
-              onClick={
-                route === "twotruths1lie"
-                  ? handlePlayTwoTruths1Lie
-                  : route === "justone"
-                    ? handlePlayJustOne
-                    : undefined
-              }
-              onKeyDown={
-                route && route !== "codenames"
-                  ? (event) => {
-                      if (event.key === "Enter" || event.key === " ") {
-                        event.preventDefault();
-                        if (route === "twotruths1lie") {
-                          handlePlayTwoTruths1Lie();
-                        } else if (route === "justone") {
-                          handlePlayJustOne();
+          {placeholderCards.map(({ title, playLabel, tone, image, route }) => {
+            const isJoinable = Boolean(route && JOINABLE_ROUTES.includes(route));
+            const isInstantPlay = Boolean(route) && !isJoinable;
+
+            return (
+              <div
+                key={title}
+                className={`flex flex-col items-center gap-3 ${isInstantPlay ? "cursor-pointer" : ""}`}
+                onClick={isInstantPlay ? () => playNewRoom(route!) : undefined}
+                onKeyDown={
+                  isInstantPlay
+                    ? (event) => {
+                        if (event.key === "Enter" || event.key === " ") {
+                          event.preventDefault();
+                          playNewRoom(route!);
                         }
                       }
-                    }
-                  : undefined
-              }
-              role={route && route !== "codenames" ? "link" : undefined}
-              tabIndex={route && route !== "codenames" ? 0 : undefined}
-            >
-              <div
-                className={`group relative flex aspect-square w-full items-center justify-center overflow-hidden rounded-2xl border border-[#D1DCE5] ${tone} shadow-sm`}
+                    : undefined
+                }
+                role={isInstantPlay ? "link" : undefined}
+                tabIndex={isInstantPlay ? 0 : undefined}
               >
-                {image ? (
-                  <img
-                    src={image}
-                    alt={title}
-                    className={`h-full w-full object-cover transition-opacity ${route === "codenames" || route === "twotruths1lie" ? "group-hover:opacity-70" : ""}`}
-                  />
-                ) : (
-                  <span className="text-sm font-medium text-[#65707B]">Image</span>
-                )}
-                {route === "codenames" && (
-                  <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-[#1F2B38]/60 opacity-0 transition-opacity group-hover:opacity-100 group-focus-within:opacity-100">
-                    <button
-                      onClick={handlePlayCodenames}
-                      className="rounded-lg bg-[#8B5CF6] px-5 py-3 font-bold text-white transition hover:bg-[#AE8EF9]"
-                    >
-                      Play Codenames
-                    </button>
-                    {currentRoomId && (
+                <div
+                  className={`group relative flex aspect-square w-full items-center justify-center overflow-hidden rounded-2xl border border-[#D1DCE5] ${tone} shadow-sm`}
+                >
+                  {image ? (
+                    <img
+                      src={image}
+                      alt={title}
+                      className={`h-full w-full object-cover transition-opacity ${route ? "group-hover:opacity-70" : ""}`}
+                    />
+                  ) : (
+                    <span className="text-sm font-medium text-[#65707B]">Image</span>
+                  )}
+                  {isJoinable && (
+                    <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-[#1F2B38]/60 opacity-0 transition-opacity group-hover:opacity-100 group-focus-within:opacity-100">
                       <button
-                        onClick={handleJoinCurrentGame}
-                        className="rounded-lg border-2 border-[#5FE8EC] bg-white px-5 py-3 font-bold text-[#1F2B38] transition hover:bg-[#C0F6F7]"
+                        onClick={() => playNewRoom(route!)}
+                        className="rounded-lg bg-[#8B5CF6] px-5 py-3 font-bold text-white transition hover:bg-[#AE8EF9]"
                       >
-                        Join current game
+                        {playLabel ?? title}
                       </button>
-                    )}
-                  </div>
-                )}
+                      {currentRoom?.route === route && (
+                        <button
+                          onClick={handleJoinCurrentGame}
+                          className="rounded-lg border-2 border-[#5FE8EC] bg-white px-5 py-3 font-bold text-[#1F2B38] transition hover:bg-[#C0F6F7]"
+                        >
+                          Join current game
+                        </button>
+                      )}
+                    </div>
+                  )}
+                </div>
+                <p className="text-sm font-bold text-[#1F2B38]">{title}</p>
               </div>
-              <p className="text-sm font-bold text-[#1F2B38]">{title}</p>
-            </div>
-          ))}
+            );
+          })}
         </section>
 
         <div className="flex w-full justify-center">
