@@ -81,24 +81,20 @@ export default function LobbyPage() {
           {placeholderCards.map(({ title, tone, image, route }) => (
             <div
               key={title}
-              className={`flex flex-col items-center gap-3 ${route ? "cursor-pointer" : ""}`}
+              className={`flex flex-col items-center gap-3 ${route && route !== "codenames" ? "cursor-pointer" : ""}`}
               onClick={
-                route === "codenames"
-                  ? handlePlayCodenames
-                  : route === "twotruths1lie"
-                    ? handlePlayTwoTruths1Lie
-                    : route === "justone"
-                      ? handlePlayJustOne
-                      : undefined
+                route === "twotruths1lie"
+                  ? handlePlayTwoTruths1Lie
+                  : route === "justone"
+                    ? handlePlayJustOne
+                    : undefined
               }
               onKeyDown={
-                route
+                route && route !== "codenames"
                   ? (event) => {
                       if (event.key === "Enter" || event.key === " ") {
                         event.preventDefault();
-                        if (route === "codenames") {
-                          handlePlayCodenames();
-                        } else if (route === "twotruths1lie") {
+                        if (route === "twotruths1lie") {
                           handlePlayTwoTruths1Lie();
                         } else if (route === "justone") {
                           handlePlayJustOne();
@@ -107,20 +103,38 @@ export default function LobbyPage() {
                     }
                   : undefined
               }
-              role={route ? "link" : undefined}
-              tabIndex={route ? 0 : undefined}
+              role={route && route !== "codenames" ? "link" : undefined}
+              tabIndex={route && route !== "codenames" ? 0 : undefined}
             >
               <div
-                className={`flex aspect-square w-full items-center justify-center overflow-hidden rounded-2xl border border-[#D1DCE5] ${tone} shadow-sm`}
+                className={`group relative flex aspect-square w-full items-center justify-center overflow-hidden rounded-2xl border border-[#D1DCE5] ${tone} shadow-sm`}
               >
                 {image ? (
                   <img
                     src={image}
-                    alt="rebuy Codenames"
-                    className="h-full w-full object-cover"
+                    alt={title}
+                    className={`h-full w-full object-cover transition-opacity ${route === "codenames" || route === "twotruths1lie" ? "group-hover:opacity-70" : ""}`}
                   />
                 ) : (
                   <span className="text-sm font-medium text-[#65707B]">Image</span>
+                )}
+                {route === "codenames" && (
+                  <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-[#1F2B38]/60 opacity-0 transition-opacity group-hover:opacity-100 group-focus-within:opacity-100">
+                    <button
+                      onClick={handlePlayCodenames}
+                      className="rounded-lg bg-[#8B5CF6] px-5 py-3 font-bold text-white transition hover:bg-[#AE8EF9]"
+                    >
+                      Play Codenames
+                    </button>
+                    {currentRoomId && (
+                      <button
+                        onClick={handleJoinCurrentGame}
+                        className="rounded-lg border-2 border-[#5FE8EC] bg-white px-5 py-3 font-bold text-[#1F2B38] transition hover:bg-[#C0F6F7]"
+                      >
+                        Join current game
+                      </button>
+                    )}
+                  </div>
                 )}
               </div>
               <p className="text-sm font-bold text-[#1F2B38]">{title}</p>
@@ -139,20 +153,6 @@ export default function LobbyPage() {
         </div>
 
         <div className="flex flex-col items-center gap-4">
-          <button
-            onClick={handlePlayCodenames}
-            className="rounded-lg bg-[#8B5CF6] px-5 py-3 font-bold text-white transition hover:bg-[#AE8EF9]"
-          >
-            Play Codenames
-          </button>
-          {currentRoomId && (
-            <button
-              onClick={handleJoinCurrentGame}
-              className="rounded-lg border-2 border-[#5FE8EC] px-5 py-3 font-bold text-[#1F2B38] transition hover:bg-[#C0F6F7]"
-            >
-              Join current game
-            </button>
-          )}
           <Link href="/scoreboard" className="font-bold text-[#EC4899] underline decoration-[#F280B8] underline-offset-4">
             View Scoreboard
           </Link>
