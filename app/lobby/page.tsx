@@ -20,7 +20,11 @@ const placeholderCards = [
     image: twoTruthsImage.src,
     route: "twotruths1lie",
   },
-  { title: "Placeholder 3", tone: "bg-zinc-200" },
+  {
+    title: "Just One",
+    tone: "bg-zinc-200",
+    route: "justone",
+  },
   { title: "Placeholder 4", tone: "bg-zinc-300" },
   { title: "Placeholder 5", tone: "bg-zinc-200" },
 ];
@@ -53,6 +57,12 @@ export default function LobbyPage() {
     router.push(`/room/${roomId}/twotruths1lie`);
   }
 
+  function handlePlayJustOne() {
+    const roomId = crypto.randomUUID();
+    localStorage.setItem("reGameCurrentRoom", roomId);
+    router.push(`/room/${roomId}/justone`);
+  }
+
   function handleJoinCurrentGame() {
     if (!currentRoomId) return;
     router.push(`/room/${currentRoomId}/codenames`);
@@ -77,7 +87,9 @@ export default function LobbyPage() {
                   ? handlePlayCodenames
                   : route === "twotruths1lie"
                     ? handlePlayTwoTruths1Lie
-                    : undefined
+                    : route === "justone"
+                      ? handlePlayJustOne
+                      : undefined
               }
               onKeyDown={
                 route
@@ -88,6 +100,8 @@ export default function LobbyPage() {
                           handlePlayCodenames();
                         } else if (route === "twotruths1lie") {
                           handlePlayTwoTruths1Lie();
+                        } else if (route === "justone") {
+                          handlePlayJustOne();
                         }
                       }
                     }
