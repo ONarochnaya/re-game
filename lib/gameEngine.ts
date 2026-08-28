@@ -8,8 +8,8 @@ function pickRandom<T>(pool: T[], count: number): T[] {
 export function createGame(wordPool: string[]): GameState {
   const words = pickRandom(wordPool, 25);
 
-  const startingTeam: Team = Math.random() < 0.5 ? "red" : "blue";
-  const otherTeam: Team = startingTeam === "red" ? "blue" : "red";
+  const startingTeam: Team = Math.random() < 0.5 ? "green" : "blue";
+  const otherTeam: Team = startingTeam === "green" ? "blue" : "green";
 
   const teamAssignments: Card["team"][] = [
     ...Array(9).fill(startingTeam),
@@ -73,13 +73,13 @@ export function checkWinCondition(state: GameState): Team | null {
   // Assassin reveal should also end the game (handing win to the other team) —
   // not yet implemented, add this branch later.
 
-  const redCards = state.cards.filter((card) => card.team === "red");
+  const greenCards = state.cards.filter((card) => card.team === "green");
   const blueCards = state.cards.filter((card) => card.team === "blue");
 
-  const redRevealed = redCards.filter((card) => card.revealed).length;
+  const greenRevealed = greenCards.filter((card) => card.revealed).length;
   const blueRevealed = blueCards.filter((card) => card.revealed).length;
 
-  if (redRevealed === redCards.length) return "red";
+  if (greenRevealed === greenCards.length) return "green";
   if (blueRevealed === blueCards.length) return "blue";
 
   return state.winner;

@@ -8,12 +8,30 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-outfit);
-  --font-display: var(--font-fredoka);
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: var(--font-outfit), sans-serif;
+  font-family: sans-serif;
+}
+
+@keyframes butterfly-float {
+  0% {
+    transform: translateY(0) translateX(0);
+    opacity: 0;
+  }
+  15% {
+    opacity: 1;
+  }
+  50% {
+    transform: translateY(-50vh) translateX(30px);
+  }
+  85% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(-100vh) translateX(-30px);
+    opacity: 0;
+  }
 }

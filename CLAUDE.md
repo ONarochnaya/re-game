@@ -137,7 +137,7 @@ its own randomly-generated board and empty players list.
   only used [game]).
 - Redirects to '/' if no sessionStorage name is found.
 - Team/role picker writes the player into game.players via setGame — visible
-  live across tabs. A "Teams" section renders players grouped by Red/Blue.
+  live across tabs. A "Teams" section renders players grouped by Green/Blue.
 - Changing team/role after initial pick is still NOT supported — out of
   scope until a future iteration.
 - Board rendering (getCardDisplay) and role-based visibility unchanged.

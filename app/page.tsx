@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 
 // Cosmetic "team" flavor for the welcome screen only — unrelated to the
-// red/blue Codenames Team type, which players pick in-game on Screen 3.
+// green/blue Codenames Team type, which players pick in-game on Screen 3.
 // Dot colors drawn from the CLAUDE.md palette (Green/Cyan/Purple/Pink).
 const TEAMS = [
   { name: "Forest", color: "#10B981" },

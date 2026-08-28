@@ -1,17 +1,25 @@
 "use client";
 
-import {useEffect, useState} from "react";
+import {useEffect, useRef, useState} from "react";
 import {useRouter} from "next/navigation";
 import {addClue, checkWinCondition, createGame, revealMultiple} from "@/lib/gameEngine";
 import {useSync} from "@/lib/useSync";
 import {WORD_POOL} from "@/lib/words";
 import type {Card, Role, Team} from "@/lib/types";
 
+const CELEBRATION_BUTTERFLY_COUNT = 10;
+const CELEBRATION_ANIMATION_MS = 3000;
+const CELEBRATION_STAGGER_MS = 300;
+
+function getTeamHex(team: Team): string {
+    return team === "green" ? "#48B500" : "#0069A1";
+}
+
 function getCardDisplay(card: Card, myRole: Role): string {
     if (card.revealed) {
         if (myRole === "operative") {
             switch (card.team) {
-                case "red":
+                case "green":
                     return "bg-[#48B500] text-white border-2 border-[#D1DCE5]";
                 case "blue":
                     return "bg-[#0069A1] text-white border-2 border-[#D1DCE5]";
@@ -23,7 +31,7 @@ function getCardDisplay(card: Card, myRole: Role): string {
         }
 
         switch (card.team) {
-            case "red":
+            case "green":
                 return "bg-[#ffffff] text-[#339E38] border-2 border-[#339E38]";
             case "blue":
                 return "bg-[#ffffff] text-[#4692BC] border-2 border-[#4692BC]";
@@ -36,7 +44,7 @@ function getCardDisplay(card: Card, myRole: Role): string {
 
     if (myRole === "spymaster") {
         switch (card.team) {
-            case "red":
+            case "green":
                 return "bg-[#48B500] text-white";
             case "blue":
                 return "bg-[#0069A1] text-white";
@@ -59,6 +67,8 @@ export default function CodenamesGame({roomId}: { roomId: string }) {
     const [clueNumber, setClueNumber] = useState("");
     const [clueError, setClueError] = useState<string | null>(null);
     const [selectedIndices, setSelectedIndices] = useState<Set<number>>(new Set());
+    const [showCelebration, setShowCelebration] = useState(false);
+    const previousWinnerRef = useRef<Team | null>(null);
     const [playerName] = useState<string | null>(() => {
         if (typeof window === "undefined") return null;
         return sessionStorage.getItem("reGamePlayerName");
@@ -69,6 +79,19 @@ export default function CodenamesGame({roomId}: { roomId: string }) {
             router.replace("/");
         }
     }, [playerName, router]);
+
+    useEffect(() => {
+        const previousWinner = previousWinnerRef.current;
+        previousWinnerRef.current = game.winner;
+
+        if (!previousWinner && game.winner) {
+            setShowCelebration(true);
+            const totalDurationMs =
+                CELEBRATION_ANIMATION_MS + (CELEBRATION_BUTTERFLY_COUNT - 1) * CELEBRATION_STAGGER_MS;
+            const timeout = setTimeout(() => setShowCelebration(false), totalDurationMs);
+            return () => clearTimeout(timeout);
+        }
+    }, [game.winner]);
 
     useEffect(() => {
         if (!team || !role || !playerName) return;
@@ -101,9 +124,9 @@ export default function CodenamesGame({roomId}: { roomId: string }) {
                     <p className="font-display text-2xl font-bold text-[#1F2B38]">Pick a team</p>
                     <div className="flex gap-2">
                         <button
-                            onClick={() => setTeam("red")}
+                            onClick={() => setTeam("green")}
                             className={`rounded bg-[#48B500] px-4 py-2 font-bold text-white ${
-                                team === "red" ? "ring-2 ring-offset-2 ring-[#1F2B38]" : ""
+                                team === "green" ? "ring-2 ring-offset-2 ring-[#1F2B38]" : ""
                             }`}
                         >
                             Green
@@ -148,13 +171,13 @@ export default function CodenamesGame({roomId}: { roomId: string }) {
         );
     }
 
-    const redPlayers = game.players.filter((p) => p.team === "red");
+    const greenPlayers = game.players.filter((p) => p.team === "green");
     const bluePlayers = game.players.filter((p) => p.team === "blue");
     const clueHistory = [...game.clueHistory].reverse();
 
-    const redCards = game.cards.filter((c) => c.team === "red");
+    const greenCards = game.cards.filter((c) => c.team === "green");
     const blueCards = game.cards.filter((c) => c.team === "blue");
-    const redRevealedCount = redCards.filter((c) => c.revealed).length;
+    const greenRevealedCount = greenCards.filter((c) => c.revealed).length;
     const blueRevealedCount = blueCards.filter((c) => c.revealed).length;
 
     function handleGiveClue() {
@@ -218,7 +241,7 @@ export default function CodenamesGame({roomId}: { roomId: string }) {
                         <div>
                             <p className="font-display text-2xl font-bold text-[#48B500]">Green</p>
                             <ul className="text-sm">
-                                {redPlayers.map((p) => (
+                                {greenPlayers.map((p) => (
                                     <li key={p.id}>
                                         {p.name === playerName ? `You: ${p.name}` : p.name} (
                                         {p.role === "spymaster" ? "Spymaster" : "Operative"})
@@ -241,7 +264,7 @@ export default function CodenamesGame({roomId}: { roomId: string }) {
 
                     <div className="flex gap-6 text-sm">
                         <p className="font-bold text-[#48B500]">
-                            Green: {redRevealedCount} / {redCards.length} revealed
+                            Green: {greenRevealedCount} / {greenCards.length} revealed
                         </p>
                         <p className="font-bold text-[#0069A1]">
                             Blue: {blueRevealedCount} / {blueCards.length} revealed
@@ -250,8 +273,27 @@ export default function CodenamesGame({roomId}: { roomId: string }) {
 
                     {game.winner && (
                         <p className="font-display text-2xl font-bold text-[#10B981]">
-                            🎉 {game.winner === "red" ? "Green" : "Blue"} team wins!
+                            🎉 {game.winner === "green" ? "Green" : "Blue"} team wins!
                         </p>
+                    )}
+
+                    {showCelebration && game.winner && (
+                        <div className="pointer-events-none fixed inset-0 z-50">
+                            {Array.from({length: CELEBRATION_BUTTERFLY_COUNT}).map((_, i) => (
+                                <span
+                                    key={i}
+                                    className="absolute bottom-0 text-3xl"
+                                    style={{
+                                        left: `${5 + i * (90 / (CELEBRATION_BUTTERFLY_COUNT - 1))}%`,
+                                        animation: `butterfly-float ${CELEBRATION_ANIMATION_MS}ms ease-in-out forwards`,
+                                        animationDelay: `${i * CELEBRATION_STAGGER_MS}ms`,
+                                        filter: `drop-shadow(0 0 6px ${getTeamHex(game.winner!)}) drop-shadow(0 0 6px ${getTeamHex(game.winner!)})`,
+                                    }}
+                                >
+                                    🦋
+                                </span>
+                            ))}
+                        </div>
                     )}
 
                     {role === "spymaster" && (
@@ -289,9 +331,9 @@ export default function CodenamesGame({roomId}: { roomId: string }) {
                             {clueHistory.map((clue) => (
                                 <li key={clue.id}>
                                     <span
-                                        className={clue.team === "red" ? "text-[#48B500]" : "text-[#0069A1]"}
+                                        className={clue.team === "green" ? "text-[#48B500]" : "text-[#0069A1]"}
                                     >
-                                        {clue.team === "red" ? "Green" : "Blue"}
+                                        {clue.team === "green" ? "Green" : "Blue"}
                                     </span>
                                     {" — "}
                                     {clue.playerName === playerName ? `You: ${clue.playerName}` : clue.playerName}
