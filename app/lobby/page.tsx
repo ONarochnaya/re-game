@@ -35,6 +35,7 @@ const placeholderCards: {
   },
   {
     title: "Two truths one lie",
+    playLabel: "Play two truths one lie",
     tone: "bg-zinc-300",
     image: twoTruthsImage.src,
     route: "twotruths1lie",
@@ -97,6 +98,7 @@ export default function LobbyPage() {
           {placeholderCards.map(({ title, playLabel, tone, image, route }) => {
             const isJoinable = Boolean(route && JOINABLE_ROUTES.includes(route));
             const isInstantPlay = Boolean(route) && !isJoinable;
+            const hasPlayOverlay = isJoinable || route === "twotruths1lie";
 
             return (
               <div
@@ -128,10 +130,13 @@ export default function LobbyPage() {
                   ) : (
                     <span className="text-sm font-medium text-[#65707B]">Image</span>
                   )}
-                  {isJoinable && (
+                  {hasPlayOverlay && (
                     <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-[#1F2B38]/60 opacity-0 transition-opacity group-hover:opacity-100 group-focus-within:opacity-100">
                       <button
-                        onClick={() => playNewRoom(route!)}
+                        onClick={(event) => {
+                          event.stopPropagation();
+                          playNewRoom(route!);
+                        }}
                         className="rounded-lg bg-[#8B5CF6] px-5 py-3 font-bold text-white transition hover:bg-[#AE8EF9]"
                       >
                         {playLabel ?? title}
