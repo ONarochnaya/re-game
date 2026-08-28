@@ -1,4 +1,4 @@
-export type Team = "red" | "blue";
+export type Team = "green" | "blue";
 
 export type Role = "spymaster" | "operative";
 

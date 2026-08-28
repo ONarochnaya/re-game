@@ -209,10 +209,10 @@ export default function CodenamesGame({roomId}: { roomId: string }) {
         <main className="flex flex-1 items-center justify-center p-8">
             <div className="flex items-start gap-8">
                 <div className="flex w-full max-w-md flex-col gap-4">
-                    {/*<h1 className="font-display text-[32px] font-bold text-[#1F2B38]">Screen 3: Codenames</h1>*/}
-                    {/*<p className="text-sm text-[#65707B]">*/}
-                    {/*    Room: {roomId} — {team} {role}*/}
-                    {/*</p>*/}
+                    <h1 className="font-display text-[32px] font-bold text-[#1F2B38]">Screen 3: Codenames</h1>
+                    <p className="text-sm text-[#65707B]">
+                        Room: {roomId} — {team} {role}
+                    </p>
 
                     <div className="grid w-full grid-cols-2 gap-4">
                         <div>
