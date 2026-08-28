@@ -25,8 +25,6 @@ const placeholderCards = [
     tone: "bg-zinc-200",
     route: "justone",
   },
-  { title: "Placeholder 4", tone: "bg-zinc-300" },
-  { title: "Placeholder 5", tone: "bg-zinc-200" },
 ];
 
 export default function LobbyPage() {
@@ -77,7 +75,7 @@ export default function LobbyPage() {
           </h1>
         </header>
 
-        <section className="grid w-full grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-5">
+        <section className="mx-auto grid w-full max-w-4xl grid-cols-1 gap-6 sm:grid-cols-3">
           {placeholderCards.map(({ title, tone, image, route }) => (
             <div
               key={title}
