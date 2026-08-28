@@ -272,7 +272,10 @@ export default function CodenamesGame({roomId}: { roomId: string }) {
                     </div>
 
                     {game.winner && (
-                        <p className="font-display text-2xl font-bold text-[#10B981]">
+                        <p
+                            className="font-display text-2xl font-bold"
+                            style={{ color: game.winner === "green" ? "#48B500" : "#0069A1" }}
+                        >
                             🎉 {game.winner === "green" ? "Green" : "Blue"} team wins!
                         </p>
                     )}
