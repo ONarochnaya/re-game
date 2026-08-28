@@ -6,6 +6,7 @@ export type JustOnePlayer = { id: string; name: string };
 export type JustOneClue = { playerName: string; word: string };
 
 export type JustOneRound = {
+  roundNumber: number;
   activePlayerName: string;
   secretWord: string;
   // Snapshot of who owes a clue this round, taken when the round starts —
@@ -52,9 +53,36 @@ export function getSurvivingClues(round: JustOneRound): JustOneClue[] {
   return round.clues.filter((clue) => counts.get(clue.word.trim().toLowerCase()) === 1);
 }
 
+// House rule: a clue can't be the secret word itself, nor contain it or be
+// contained within it (e.g. secret "MacBook" blocks clues "Mac" and "Book",
+// and secret "Harry Potter" blocks "Harry" or "Potter") — case-insensitive.
+export function isClueTooCloseToSecretWord(word: string, secretWord: string): boolean {
+  const clue = word.trim().toLowerCase();
+  const secret = secretWord.trim().toLowerCase();
+  return clue.length > 0 && (secret.includes(clue) || clue.includes(secret));
+}
+
+// Just One needs at least one guesser and two clue-givers for the "remove
+// duplicate clues" rule to mean anything — below that every clue would be
+// unique by default and the game loses its core mechanic.
+export const MIN_PLAYERS = 3;
+
+// The game is capped at 13 rounds/words; score is how many were guessed
+// correctly out of those 13.
+export const MAX_ROUNDS = 13;
+
+export function isGameOver(state: JustOneState): boolean {
+  return state.history.length >= MAX_ROUNDS;
+}
+
+export function getScore(state: JustOneState): number {
+  return state.history.filter((entry) => entry.result === "correct").length;
+}
+
 export function startRound(state: JustOneState, wordPool: string[]): JustOneState {
-  if (state.players.length < 2) return state;
+  if (state.players.length < MIN_PLAYERS) return state;
   if (state.round && state.round.phase !== "complete") return state;
+  if (isGameOver(state)) return state;
 
   const activeIndex = state.nextActiveIndex % state.players.length;
   const activePlayerName = state.players[activeIndex].name;
@@ -67,6 +95,7 @@ export function startRound(state: JustOneState, wordPool: string[]): JustOneStat
     ...state,
     nextActiveIndex: activeIndex + 1,
     round: {
+      roundNumber: state.history.length + 1,
       activePlayerName,
       secretWord,
       clueGivers,

@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import codenamesImage from "./codenames.png";
+import justOneImage from "./justone.png";
 import simpleLeaderboard from "./simple-leaderboard.png";
 import twoTruthsImage from "./twotruths.png";
 
@@ -42,6 +43,7 @@ const placeholderCards: {
     title: "Just One",
     playLabel: "Play Just One",
     tone: "bg-zinc-200",
+    image: justOneImage.src,
     route: "justone",
   },
 ];

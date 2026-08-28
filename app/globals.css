@@ -37,3 +37,31 @@ body {
     opacity: 0;
   }
 }
+
+/* Just One's correct-guess celebration: starts centered, "blows up" with a
+   quick scale-up, then falls away under gravity. --drift/--rotate are set
+   per-emoji inline so a burst of these doesn't all move identically. */
+@keyframes just-one-clap {
+  0% {
+    transform: translate(-50%, -50%) scale(0) rotate(0deg);
+    opacity: 0;
+  }
+  25% {
+    transform: translate(calc(-50% + var(--drift, 0px) * 0.2), -50%) scale(1.6)
+      rotate(calc(var(--rotate, 0deg) * 0.3));
+    opacity: 1;
+  }
+  45% {
+    transform: translate(calc(-50% + var(--drift, 0px) * 0.5), -50%) scale(1.1)
+      rotate(calc(var(--rotate, 0deg) * 0.6));
+    opacity: 1;
+  }
+  100% {
+    transform: translate(calc(-50% + var(--drift, 0px)), 70vh) scale(0.9) rotate(var(--rotate, 0deg));
+    opacity: 0;
+  }
+}
+
+.animate-just-one-clap {
+  animation: just-one-clap 1.6s cubic-bezier(0.22, 0.9, 0.32, 1) forwards;
+}
